@@ -1,0 +1,39 @@
+.infoContainer {
+  height: 100px;
+  width: 100%;
+  margin-top: -30px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0px 20px;
+  align-items: center;
+}
+
+.infoContainer .bloggerInfo {
+display: flex;
+}
+
+.infoContainer .bloggerInfo .bloggerInfoContainer {
+justify-content: center;
+display: flex;
+flex-direction: column;
+margin-left: 10px;
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  sans-serif;
+}
+
+.infoContainer .bloggerInfo .bloggerName {
+font-weight: 500;
+  margin-top: 15px;
+  font-size: 18px;
+}
+
+.infoContainer .bloggerInfo .date {
+color: #78909c;
+}
+
+.shareContainer {
+width: 115px;
+  display: flex;
+  justify-content: space-between;
+}

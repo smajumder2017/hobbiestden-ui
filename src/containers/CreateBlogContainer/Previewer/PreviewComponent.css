@@ -1,0 +1,20 @@
+.preview-container {
+  padding: 20px;
+  font-family: 'Merriweather', serif;
+  min-height: calc(100vh - 64px);
+  height: calc(100vh - 64px);;
+  overflow-y: scroll;
+}
+
+.preview-container .title {
+  color: #212121;
+  font-weight: 400;
+  font-size: 40px;
+  text-align: center;
+}
+.preview-container .subtitle {
+  color: #78909c;
+  font-size: 25px;
+  font-style: italic;
+  text-align: center;
+}
