@@ -12,8 +12,15 @@ import {
   UPDATE_COVERIMAGE,
   UPDATE_TEMP_COVERIMAGE,
   UPDATE_SECTION_CONTENT_IMAGE,
+  FETCH_BLOG_REQUEST,
+  FETCH_BLOG_SUCCESS,
+  FETCH_BLOG_FAILURE,
+  SAVE_BLOG_REQUEST,
+  SAVE_BLOG_SUCCESS,
+  SAVE_BLOG_FAILURE,
 } from "../actions/createBlogActions";
 import { ICreateBlog, IBlogSections } from "../../models/CreateBlogModel";
+import { LOADING, SUCCESS, ERROR } from "../../utils/actionCreators";
 
 const getInitialSection = (): IBlogSections[] => [
   {
@@ -27,6 +34,8 @@ const getInitialSection = (): IBlogSections[] => [
           borderColor: null,
           imageHeight: null,
           imageWidth: null,
+          codeTheme: "Docco",
+          codeLanguage: "javascript",
         },
       },
       center: {
@@ -37,6 +46,8 @@ const getInitialSection = (): IBlogSections[] => [
           borderColor: null,
           imageHeight: null,
           imageWidth: null,
+          codeTheme: "Docco",
+          codeLanguage: "javascript",
         },
       },
       right: {
@@ -47,13 +58,23 @@ const getInitialSection = (): IBlogSections[] => [
           borderColor: null,
           imageHeight: null,
           imageWidth: null,
+          codeTheme: "Docco",
+          codeLanguage: "javascript",
         },
       },
     },
   },
 ];
 
-const initialState: IReducerInitialState<ICreateBlog> = {
+interface ICreateBlogReducerInitialState
+  extends IReducerInitialState<ICreateBlog> {
+  blogId?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  status?: "CREATED" | "SUBMITTED" | "APPROVED" | "NOT APPROVED";
+}
+
+const initialState: ICreateBlogReducerInitialState = {
   asyncStatus: "INIT",
   data: {
     title: "",
@@ -68,8 +89,52 @@ const initialState: IReducerInitialState<ICreateBlog> = {
 export function createBlog(
   state = { ...initialState },
   action: CreateBlogActionsType
-): IReducerInitialState<ICreateBlog> {
+): ICreateBlogReducerInitialState {
   switch (action.type) {
+    case FETCH_BLOG_REQUEST: {
+      return {
+        ...state,
+        asyncStatus: LOADING,
+      };
+    }
+    case FETCH_BLOG_SUCCESS: {
+      state.data = action.payload.res.content;
+      return {
+        ...state,
+        asyncStatus: SUCCESS,
+      };
+    }
+    case FETCH_BLOG_FAILURE: {
+      return {
+        ...state,
+        asyncStatus: ERROR,
+      };
+    }
+    case SAVE_BLOG_REQUEST: {
+      return {
+        ...state,
+        asyncStatus: LOADING,
+      };
+    }
+    case SAVE_BLOG_SUCCESS: {
+      if (state.data) {
+        state.blogId = action.payload.res.blogId;
+        state.createdAt = action.payload.res.createdAt;
+        state.updatedAt = action.payload.res.updatedAt;
+        state.status = action.payload.res.status;
+      }
+
+      return {
+        ...state,
+        asyncStatus: SUCCESS,
+      };
+    }
+    case SAVE_BLOG_FAILURE: {
+      return {
+        ...state,
+        asyncStatus: ERROR,
+      };
+    }
     case UPDATE_TITLE: {
       if (state.data) {
         state.data.title = action.payload.req.title;
@@ -116,7 +181,6 @@ export function createBlog(
           },
         };
       }
-
       return {
         ...state,
       };
@@ -144,10 +208,10 @@ export function createBlog(
         state.data.sections[action.payload.req.sectionIndex].subSections[
           action.payload.req.subSection
         ].contentType = action.payload.req.contentType;
-        if(action.payload.req.contentType === 'none') {
+        if (action.payload.req.contentType === "none") {
           state.data.sections[action.payload.req.sectionIndex].subSections[
             action.payload.req.subSection
-          ].contentValue = ""
+          ].contentValue = "";
         }
       }
       return {
@@ -176,7 +240,14 @@ export function createBlog(
     }
     case UPDATE_CONTENT_META: {
       const {
-        contentMeta: { backgroundColor, borderColor, imageHeight, imageWidth },
+        contentMeta: {
+          backgroundColor,
+          borderColor,
+          imageHeight,
+          imageWidth,
+          codeTheme,
+          codeLanguage,
+        },
         sectionIndex,
         subSection,
       } = action.payload.req;
@@ -200,6 +271,16 @@ export function createBlog(
           state.data.sections[sectionIndex].subSections[
             subSection
           ].contentMeta.imageWidth = imageWidth;
+        }
+        if (codeTheme) {
+          state.data.sections[sectionIndex].subSections[
+            subSection
+          ].contentMeta.codeTheme = codeTheme;
+        }
+        if (codeTheme) {
+          state.data.sections[sectionIndex].subSections[
+            subSection
+          ].contentMeta.codeLanguage = codeLanguage;
         }
       }
       return {

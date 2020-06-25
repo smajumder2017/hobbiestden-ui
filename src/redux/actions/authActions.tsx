@@ -9,9 +9,14 @@ export const FETCH_USER = 'FETCH_USER';
 export const FETCH_USER_SUCCESS = 'FETCH_USER_SUCCESS';
 export const FETCH_USER_FAILURE = 'FETCH_USER_FAILURE';
 
+export const REGISTER_USER_REQUEST = 'REGISTER_USER_REQUEST';
+export const REGISTER_USER_SUCCESS = 'REGISTER_USER_SUCCESS';
+export const REGISTER_USER_FAILURE = 'REGISTER_USER_FAILURE';
+
 export const LOGOUT= 'LOGOUT';
 
 const AuthActions = {
+  createUser: createAsyncAction([REGISTER_USER_REQUEST, REGISTER_USER_SUCCESS, REGISTER_USER_FAILURE], api.createBlog),
   login: createAsyncAction([LOGIN_USER, LOGIN_USER_SUCCESS, LOGIN_USER_FAILURE], api.login),
   fetchUser: createAsyncAction([FETCH_USER, FETCH_USER_SUCCESS, FETCH_USER_FAILURE], api.fetchSession),
   logout: () => createAction('LOGOUT', {}, {}),

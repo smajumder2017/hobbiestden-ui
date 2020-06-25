@@ -10,7 +10,8 @@ interface IOwnProps {
   crop: boolean;
   handleCropSubmit?: (file: File) => Promise<void>;
   onFileSelect?: (file: string) => void;
-  buttonText: string
+  buttonText: string;
+  loader?: boolean;
 }
 
 export const FileUploader: React.FC<IOwnProps> = (props) => {
@@ -36,6 +37,7 @@ export const FileUploader: React.FC<IOwnProps> = (props) => {
       width: 30,
       aspect: 16 / 4,
     });
+    if(fileInputRef.current?.value) fileInputRef.current.value = ""
     setCropModal(false);
   };
 
@@ -143,6 +145,7 @@ export const FileUploader: React.FC<IOwnProps> = (props) => {
       <div style={{ display: "flex" }}>
         <Button
           block
+          loading={props.loader}
           type="dashed"
           icon={<UploadOutlined />}
           onClick={() => {

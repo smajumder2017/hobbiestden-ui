@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { withRouter, RouteComponentProps } from "react-router-dom";
-import { Form, Input, Button, Checkbox, Tabs } from "antd";
+import { Form, Input, Button, Checkbox, Tabs, Divider } from "antd";
 import { IHobbiestDenAppState } from "../../redux/reducers";
 import AuthActions from "../../redux/actions/authActions";
 import { GetConnectDispatchPropsType } from "../../utils/actionCreators";
-import { MailOutlined, LockOutlined, UserOutlined } from "@ant-design/icons";
+import { MailOutlined, LockOutlined, UserOutlined, FacebookFilled, GoogleSquareFilled } from "@ant-design/icons";
 import { Dispatch, bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import cookies from 'react-cookies';
@@ -75,6 +75,14 @@ const LoginForm: React.FC<ILoginForm> = (props) => {
   );
 };
 
+interface IRegisterProps {
+  email: string;
+  firstName: string;
+  lastName: string;
+  password: string;
+  confirmPassword: string;
+}
+
 const RegisterForm = () => {
   return (
     <Form className="login-form">
@@ -139,7 +147,8 @@ const LoginRegister: React.FC<TAllProps> = (props) => {
     }
   };
   return (
-    <Tabs defaultActiveKey="1">
+    <div>
+      <Tabs defaultActiveKey="1">
       <TabPane tab="Login" key="1" style={{ padding: "5px" }}>
         <LoginForm
           email={email}
@@ -153,6 +162,20 @@ const LoginRegister: React.FC<TAllProps> = (props) => {
         <RegisterForm />
       </TabPane>
     </Tabs>
+    <Divider orientation="center">
+      OR
+      </Divider>
+    <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+      <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+        <div style={{marginRight:"5px"}}>
+        <Button icon={<FacebookFilled />} type="primary" >Facebook</Button>
+        </div>
+        <div style={{marginLeft:"5px"}}>
+        <Button icon={<GoogleSquareFilled />}type="primary"  danger>Google</Button>
+        </div>
+      </div>
+    </div>
+    </div>
   );
 };
 

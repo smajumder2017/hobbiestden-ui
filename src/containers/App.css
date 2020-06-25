@@ -1,9 +1,13 @@
 .logo {
-  width: 120px;
+  width: 135px;
   height: 31px;
-  background: rgba(255, 255, 255, 0.2);
+  /* background: rgba(255, 255, 255, 0.2); */
   margin: 16px 24px 16px 0;
   float: left;
+  background-image: url('../assets/LogoMakr_4JLfkG.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  transform: scale(1.5);
 }
 
 .ant-layout {

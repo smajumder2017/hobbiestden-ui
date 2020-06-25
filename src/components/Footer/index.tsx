@@ -4,7 +4,7 @@ import { withRouter } from 'react-router';
 import {RouteComponentProps} from 'react-router-dom';
 
 const Footer: React.FC<RouteComponentProps> = (props) => {
-  if(props.location.pathname === '/blogger/create') {
+  if((/\/blogger\/create\/[a-zA-Z0-9]+$/g).test(props.location.pathname)) {
     return null;
   }
   return<Layout.Footer>Footer</Layout.Footer>

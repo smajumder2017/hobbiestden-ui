@@ -11,9 +11,9 @@ import cookies from "react-cookies";
 import Navbar from "../components/Navbar";
 import HomeContainer from "../containers/HomeContainer";
 import Login from "../components/Login";
-import CreateBlogContainer from '../containers/CreateBlogContainer';
-import Footer from '../components/Footer';
-
+import CreateBlogContainer from "../containers/CreateBlogContainer";
+import BloggerContainer from "../containers/BloggerContainer";
+import Footer from "../components/Footer";
 
 import "antd/dist/antd.css";
 import "./App.css";
@@ -58,10 +58,21 @@ export const App: React.FC<TAllProps> = (props) => {
           <Switch>
             <Route path="/home" render={(routerProps) => <HomeContainer />} />
             <Route path="/hello2" render={(routerProps) => <div>Hello2</div>} />
-            {
-              props.auth.authenticated && <Route path="/blogger/create" render={(routerProps) => <CreateBlogContainer />} />
-            }
-            <Route path="/blogger/create" render={(routerProps) => <CreateBlogContainer />} />
+            {props.auth.authenticated && (
+              <Route
+                path="/blogger/create/:blogid"
+                render={(routerProps) => (
+                  <CreateBlogContainer {...routerProps} />
+                )}
+              />
+            )}
+            {props.auth.authenticated && (
+              <Route
+                path="/blogger"
+                render={(routerProps) => <BloggerContainer {...routerProps} />}
+              />
+            )}
+            {/* <Route path="/blogger/create/:blogid" render={(routerProps) => <CreateBlogContainer {...routerProps} />} /> */}
           </Switch>
         </Layout.Content>
         <Footer />

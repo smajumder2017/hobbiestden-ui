@@ -36,3 +36,8 @@
   height: 100px;
   object-fit: contain;
 }
+
+.textContent p{
+  text-overflow: ellipsis;
+    white-space: normal;
+ }

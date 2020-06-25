@@ -15,7 +15,7 @@ export interface IBlogSections {
 }
 
 export interface IContent {
-  contentType: "none" | "text" | "image" | "video";
+  contentType: "none" | "text" | "image" | "video" | "code";
   contentValue: string;
   contentMeta: IContentMeta;
 }
@@ -26,5 +26,25 @@ export interface IContentMeta {
   imageHeight: string | null;
   imageWidth: string | null;
   mainTainAspectRatio?: boolean;
+  codeLanguage?: string;
+  codeTheme?: string;
 }
 
+interface IContentResponse extends ICreateBlog {
+  tempCoverImage: never;
+}
+
+export interface ICreateBlogRequest {title: string, category: string, thumbnailImage: string};
+
+export interface IBlogResponse {
+  status: "CREATED" | "SUBMITTED" | "APPROVED" | "NOT APPROVED";
+  approver: string | null;
+  _id: string;
+  creator: string;
+  blogId: string;
+  category: string;
+  thumbnailImage: string | null;
+  createdAt: string;
+  updatedAt: string;
+  content: IContentResponse;
+}

@@ -1,6 +1,6 @@
-import { GetActionTypes, createAction } from "../../utils/actionCreators";
+import { GetActionTypes, createAction, createAsyncAction } from "../../utils/actionCreators";
 import { IContentMeta } from "../../models/CreateBlogModel";
-// import * as api from '../../apis';
+import * as api from '../../apis';
 
 export const UPDATE_TITLE = "UPDATE_TITLE";
 export const UPDATE_SUBTITLE = "UPDATE_SUBTITLE";
@@ -13,6 +13,14 @@ export const REMOVE_SECTION = "REMOVE_SECTION";
 export const UPDATE_COVERIMAGE = 'UPDATE_COVERIMAGE';
 export const UPDATE_TEMP_COVERIMAGE = 'UPDATE_TEMP_COVERIMAGE';
 export const UPDATE_SECTION_CONTENT_IMAGE = 'UPDATE_SECTION_CONTENT_IMAGE';
+
+export const FETCH_BLOG_REQUEST = 'FETCH_BLOG_REQUEST';
+export const FETCH_BLOG_SUCCESS = 'FETCH_BLOG_SUCCESS';
+export const FETCH_BLOG_FAILURE = 'FETCH_BLOG_FAILURE';
+
+export const SAVE_BLOG_REQUEST = 'SAVE_BLOG_REQUEST';
+export const SAVE_BLOG_SUCCESS = 'SAVE_BLOG_SUCCESS';
+export const SAVE_BLOG_FAILURE = 'SAVE_BLOG_FAILURE';
 
 const CreateBlogActions = {
   addSection: () => createAction(ADD_SECTION, {}, {}),
@@ -32,7 +40,7 @@ const CreateBlogActions = {
   updateContentType: (args: {
     sectionIndex: number;
     subSection: "left" | "right" | "center";
-    contentType: "none" | "text" | "image" | "video";
+    contentType: "none" | "text" | "image" | "video" | "code";
   }) => createAction(UPDATE_SECTION, args, {}),
 
   updateContent: (args: {
@@ -57,7 +65,9 @@ const CreateBlogActions = {
       {}
     ),
 
-    removeSection : (sectionIndex: number) => createAction(REMOVE_SECTION, {sectionIndex}, {})
+  removeSection : (sectionIndex: number) => createAction(REMOVE_SECTION, {sectionIndex}, {}),
+  fetchBlogById: createAsyncAction([FETCH_BLOG_REQUEST, FETCH_BLOG_SUCCESS, FETCH_BLOG_FAILURE], api.fetchBlogById),
+  saveBlog: createAsyncAction([SAVE_BLOG_REQUEST, SAVE_BLOG_SUCCESS, SAVE_BLOG_FAILURE], api.saveBlog)
 };
 
 export default CreateBlogActions;

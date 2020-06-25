@@ -15,6 +15,7 @@
     "@types/react-dom": "^16.9.0",
     "@types/react-draft-wysiwyg": "^1.13.0",
     "antd": "^4.3.4",
+    "csstype": "^2.6.10",
     "draft-js": "^0.11.6",
     "draft-js-export-html": "^1.4.1",
     "history": "^5.0.0",
@@ -29,6 +30,7 @@
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
+    "react-syntax-highlighter": "^12.2.1",
     "redux": "^4.0.5",
     "redux-devtools-extension": "^2.13.8",
     "redux-logger": "^3.0.6",
@@ -63,6 +65,7 @@
     "@types/react-redux": "^7.1.9",
     "@types/react-router": "^5.1.7",
     "@types/react-router-dom": "^5.1.5",
+    "@types/react-syntax-highlighter": "^11.0.4",
     "@types/redux": "^3.6.0",
     "@types/redux-logger": "^3.0.8",
     "@types/redux-thunk": "^2.1.0"

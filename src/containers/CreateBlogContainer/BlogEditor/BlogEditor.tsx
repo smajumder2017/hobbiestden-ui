@@ -1,17 +1,7 @@
-import React, { useState } from "react";
-import {
-  Button,
-  Input,
-  Divider,
-  Collapse,
-  Form,
-  TreeSelect,
-} from "antd";
-import {
-  PlusCircleOutlined,
-  MinusCircleOutlined,
-  CloseCircleFilled,
-} from "@ant-design/icons";
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useState, useEffect } from "react";
+import { Button, Input, Divider, Collapse, Form, TreeSelect } from "antd";
+import { PlusCircleOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import { IHobbiestDenAppState } from "../../../redux/reducers";
 import { Dispatch, bindActionCreators } from "redux";
 import { connect } from "react-redux";
@@ -19,207 +9,60 @@ import { IContentMeta } from "../../../models/CreateBlogModel";
 import CreateBlogActions from "../../../redux/actions/createBlogActions";
 import FileUploadActions from "../../../redux/actions/imageUploadAction";
 import { GetConnectDispatchPropsType } from "../../../utils/actionCreators";
-import { FileUploader } from "./ImageUploader";
-import {SectionContent} from './SectionContentEditorComponent';
+import { FileUploader } from "./EditorImageUploader";
+import { SectionContent } from "./SectionContentEditorComponent";
+import ImageViewer from "../../../components/ImageViewer";
 
 import "./BlogEditor.css";
 
 const { Panel } = Collapse;
 const FormItem = Form.Item;
 
+interface IOwnProps {
+  blogId: string;
+}
+
 type TStateProps = ReturnType<typeof mapStateToProps>;
 type TBindActionCreators = typeof CreateBlogActions & typeof FileUploadActions;
 type TDispatchProps = GetConnectDispatchPropsType<TBindActionCreators>;
 
-type TAllProps = TStateProps & TDispatchProps;
+type TAllProps = TStateProps & TDispatchProps & IOwnProps;
 
-// interface ISectionContentProps extends IContent {
-//   handleContentTypeChange: (value: "none" | "text" | "image" | "video") => void;
-//   handleContentChange: (value: string) => void;
-//   handleBackgroundColorChange?: (value: string) => void;
-//   handleBorderColorChange?: (value: string) => void;
-//   handleImageUpload?: (file: File) => Promise<void>;
-// }
-
-// const SectionContent: React.FC<ISectionContentProps> = (props) => {
-//   const [editorState, setEditorState] = useState(false);
-
-//   const handleEditorClose = () => setEditorState((prv) => !prv);
-
-//   const handleContentTypeChange = (
-//     value: "none" | "text" | "image" | "video"
-//   ) => {
-//     props.handleContentTypeChange(value);
-//   };
-
-//   const handleContentChange = (value: string) => {
-//     props.handleContentChange(value);
-//   };
-
-//   const handleBackgroundColorChange = (value: string) => {
-//     if (props.handleBackgroundColorChange) {
-//       props.handleBackgroundColorChange(value);
-//     }
-//   };
-
-//   const handleBorderColorChange = (value: string) => {
-//     if (props.handleBorderColorChange) {
-//       props.handleBorderColorChange(value);
-//     }
-//   };
-
-//   const handleImageUpload = async (file: File) => {
-//     if (props.handleImageUpload) {
-//       props.handleImageUpload(file);
-//     }
-//   };
-//   return (
-//     <div>
-//       <div style={{ display: "flex", justifyContent: "space-between" }}>
-//         <div>Content Type</div>
-//         <Select
-//           defaultValue={props.contentType}
-//           onChange={(value) => handleContentTypeChange(value)}
-//         >
-//           <Select.Option value="none">None</Select.Option>
-//           <Select.Option value="text">Text</Select.Option>
-//           <Select.Option value="image">Image</Select.Option>
-//           <Select.Option value="video">Video</Select.Option>
-//           <Select.Option value="code">Code</Select.Option>
-//         </Select>
-//       </div>
-//       {props.contentType === "text" && props.contentValue && (
-//         <>
-//           <div style={{ marginTop: "10px" }}>
-//             <Card style={{ width: "100%" }}>
-//               <div
-//                 style={{
-//                   height: "70px",
-//                   whiteSpace: "nowrap",
-//                   overflowY: "hidden",
-//                   textOverflow: "ellipsis",
-//                 }}
-//               >
-//                 {parse(props.contentValue)}
-//               </div>
-//             </Card>
-//           </div>
-
-//           <div style={{ marginTop: "10px" }}>
-//             <div
-//               style={{
-//                 display: "flex",
-//                 justifyContent: "space-between",
-//                 marginTop: "10px",
-//               }}
-//             >
-//               <div style={{ flex: 1 }}>
-//                 <Input
-//                   addonBefore="Background Color"
-//                   placeholder="#Hex Code"
-//                   style={{ width: "100%" }}
-//                   onChange={(e) => handleBackgroundColorChange(e.target.value)}
-//                 />
-//               </div>
-//               <div
-//                 style={{
-//                   height: "30px",
-//                   width: "30px",
-//                   borderRadius: "50%",
-//                   backgroundColor: props.contentMeta.backgroundColor || "#FFF",
-//                   marginLeft: "5px",
-//                 }}
-//               ></div>
-//             </div>
-//             <div
-//               style={{
-//                 display: "flex",
-//                 justifyContent: "space-between",
-//                 marginTop: "10px",
-//               }}
-//             >
-//               <div style={{ flex: 1 }}>
-//                 <Input
-//                   addonBefore="Border Color"
-//                   placeholder="#Hex Code"
-//                   style={{ width: "100%" }}
-//                   onChange={(e) => handleBorderColorChange(e.target.value)}
-//                 />
-//               </div>
-//               <div
-//                 style={{
-//                   height: "30px",
-//                   width: "30px",
-//                   borderRadius: "50%",
-//                   backgroundColor: props.contentMeta.borderColor || "#FFF",
-//                   marginLeft: "5px",
-//                 }}
-//               ></div>
-//             </div>
-//           </div>
-//         </>
-//       )}
-//       {props.contentType === "text" && (
-//         <div style={{ marginTop: "10px" }}>
-//           <Button
-//             type="dashed"
-//             style={{ width: "100%" }}
-//             onClick={handleEditorClose}
-//           >
-//             Open Editor
-//           </Button>
-//         </div>
-//       )}
-//       {props.contentType === "image" && (
-//         <>
-//           {props.contentValue && <div
-//             style={{
-//               display: "flex",
-//               justifyContent: "center",
-//               marginTop: "10px",
-//             }}
-//           >
-//             <img src={props.contentValue} alt="" className="contentImage" />
-//           </div>}
-//           <div style={{ marginTop: "10px" }}>
-//             <FileUploader
-//               value={props.contentValue}
-//               handleUpload={(file) => handleImageUpload(file)}
-//               crop={false}
-//               buttonText="Upload Image"
-//             />
-//           </div>
-//         </>
-//       )}
-//       {
-//         props.contentType === "video" && (
-//           <>
-//           <Input
-//                   addonBefore="Link"
-//                   placeholder="Enter Youtube Link"
-//                   style={{ width: "100%" }}
-//                   onChange={(e) => handleContentChange(e.target.value)}
-//                 />
-//           </>
-//         )
-//       }
-
-//       <TextEditor
-//         drwaerState={editorState}
-//         handleClose={handleEditorClose}
-//         onEditorChange={handleContentChange}
-//       />
-//     </div>
-//   );
-// };
 const BlogEditor: React.FC<TAllProps> = (props) => {
   const [tags, setTags] = useState<string[]>([]);
+  const [loader, setLoader] = useState(false);
+  useEffect(() => {
+    (async () => {
+      if (props.createBlog.data) {
+        const { title, subTitle, coverImageUrl } = props.createBlog.data;
+        if (title || subTitle || coverImageUrl) saveBlog();
+      }
+    })();
+  }, [
+    props.createBlog.data?.title,
+    props.createBlog.data?.subTitle,
+    props.createBlog.data?.coverImageUrl,
+  ]);
+
+  const saveBlog = () => {
+    if (props.createBlog.data) {
+      const content = { ...props.createBlog.data };
+      delete content.tempCoverImage;
+      console.log(content);
+      props.saveBlog({
+        blogId: props.blogId,
+        content,
+      });
+    }
+  };
+
   const handleContentTypeUpdate = (
-    value: "none" | "text" | "image" | "video",
+    value: "none" | "text" | "image" | "video" | "code",
     sectionIndex: number,
     subSection: "left" | "right" | "center"
   ) => {
     props.updateContentType({ sectionIndex, subSection, contentType: value });
+    saveBlog();
   };
 
   const handleContentValueUpdate = (
@@ -260,11 +103,62 @@ const BlogEditor: React.FC<TAllProps> = (props) => {
       borderColor: value || "#FFF",
       imageHeight: null,
       imageWidth: null,
+      codeTheme: "",
+      codeLanguage: "",
+    };
+    props.updateContentMeta({ contentMeta, sectionIndex, subSection });
+  };
+
+  const handleAdjustImageChange = (
+    value: string,
+    sectionIndex: number,
+    subSection: "left" | "right" | "center"
+  ) => {
+    const contentMeta: IContentMeta = {
+      backgroundColor: null,
+      borderColor: null,
+      imageHeight: null,
+      imageWidth: value,
+      codeTheme: "",
+      codeLanguage: "",
+    };
+    props.updateContentMeta({ contentMeta, sectionIndex, subSection });
+  };
+
+  const handleCodeThemeChange = (
+    value: string,
+    sectionIndex: number,
+    subSection: "left" | "right" | "center"
+  ) => {
+    const contentMeta: IContentMeta = {
+      backgroundColor: null,
+      borderColor: null,
+      imageHeight: null,
+      imageWidth: null,
+      codeTheme: value,
+      codeLanguage: "",
+    };
+    props.updateContentMeta({ contentMeta, sectionIndex, subSection });
+  };
+
+  const handleCodeLanguageChange = (
+    value: string,
+    sectionIndex: number,
+    subSection: "left" | "right" | "center"
+  ) => {
+    const contentMeta: IContentMeta = {
+      backgroundColor: null,
+      borderColor: null,
+      imageHeight: null,
+      imageWidth: null,
+      codeTheme: "",
+      codeLanguage: value,
     };
     props.updateContentMeta({ contentMeta, sectionIndex, subSection });
   };
 
   const handleCoverImageUpload = async (file: File, crop: boolean) => {
+    setLoader(true);
     const payload = new FormData();
     payload.set("image", file);
     payload.set("fileName", file.name);
@@ -279,8 +173,10 @@ const BlogEditor: React.FC<TAllProps> = (props) => {
         props.updateTempCoverImage(url);
       } else {
         props.updateCoverImage(url);
+        props.updateTempCoverImage("");
       }
     } catch (error) {}
+    setLoader(false);
   };
 
   const hanldeContentImageUpload = async (
@@ -311,38 +207,26 @@ const BlogEditor: React.FC<TAllProps> = (props) => {
         <Form style={{ paddingLeft: "10px", paddingRight: "10px" }}>
           <FormItem>
             <Input
-              addonBefore="Blog Title"
-              placeholder="Enter Title"
+              addonBefore="Title"
+              placeholder="Enter Blog Title"
               onChange={(e) => props.updateTitle(e.target.value)}
               value={props.createBlog.data?.title}
             />
           </FormItem>
           <FormItem>
             <Input
-              placeholder="Enter Sub Title"
-              addonBefore="Blog Subtitle"
+              placeholder="Enter Blog Subtitle"
+              addonBefore="Subtitle"
               onChange={(e) => props.updateSubtitle(e.target.value)}
               value={props.createBlog.data?.subTitle}
             />
           </FormItem>
           <FormItem>
             {props.createBlog.data?.coverImageUrl && (
-              <div style={{ marginBottom: "10px", position: "relative" }}>
-                <Button
-                  danger
-                  type="dashed"
-                  onClick={() => {
-                    props.updateCoverImage("");
-                  }}
-                  icon={<CloseCircleFilled />}
-                  style={{ position: "absolute", right: 0 }}
-                ></Button>
-                <img
-                  style={{ width: "100%", height: "auto" }}
-                  src={props.createBlog.data?.coverImageUrl}
-                  alt="not avilable"
-                />
-              </div>
+              <ImageViewer
+                src={props.createBlog.data.coverImageUrl}
+                handleRemoveImage={() => props.updateCoverImage("")}
+              />
             )}
             <FileUploader
               value={props.createBlog.data?.tempCoverImage || ""}
@@ -351,6 +235,7 @@ const BlogEditor: React.FC<TAllProps> = (props) => {
               crop={true}
               handleCropSubmit={(file) => handleCoverImageUpload(file, false)}
               buttonText="Upload Cover Image"
+              loader={loader}
             />
           </FormItem>
           <FormItem>
@@ -402,6 +287,7 @@ const BlogEditor: React.FC<TAllProps> = (props) => {
                 onChange={(e) =>
                   handleSectionHeadingChange(e.target.value, index)
                 }
+                onBlur={saveBlog}
               />
               <div>
                 <div style={{ marginTop: "10px" }}>
@@ -409,6 +295,7 @@ const BlogEditor: React.FC<TAllProps> = (props) => {
                 </div>
 
                 <SectionContent
+                  useSave={saveBlog}
                   {...section.subSections.left}
                   handleBackgroundColorChange={(value) =>
                     handleBackgroundColorChange(value, index, "left")
@@ -425,6 +312,13 @@ const BlogEditor: React.FC<TAllProps> = (props) => {
                   handleImageUpload={(file) =>
                     hanldeContentImageUpload(file, index, "left")
                   }
+                  handleCodeThemeChange={(value) =>
+                    handleCodeThemeChange(value, index, "left")
+                  }
+                  handleCodeLanguageChange={(value) =>
+                    handleCodeLanguageChange(value, index, "left")
+                  }
+                  handleAdjustImageSize={(value)=>handleAdjustImageChange(value, index, "left")}
                 />
               </div>
               <div>
@@ -432,6 +326,7 @@ const BlogEditor: React.FC<TAllProps> = (props) => {
                   <b>Center Content</b>
                 </div>
                 <SectionContent
+                  useSave={saveBlog}
                   {...section.subSections.center}
                   handleBackgroundColorChange={(value) =>
                     handleBackgroundColorChange(value, index, "center")
@@ -448,6 +343,13 @@ const BlogEditor: React.FC<TAllProps> = (props) => {
                   handleImageUpload={(file) =>
                     hanldeContentImageUpload(file, index, "center")
                   }
+                  handleCodeThemeChange={(value) =>
+                    handleCodeThemeChange(value, index, "center")
+                  }
+                  handleCodeLanguageChange={(value) =>
+                    handleCodeLanguageChange(value, index, "center")
+                  }
+                  handleAdjustImageSize={(value)=>handleAdjustImageChange(value, index, "center")}
                 />
               </div>
               <div>
@@ -455,6 +357,7 @@ const BlogEditor: React.FC<TAllProps> = (props) => {
                   <b>Right Content</b>
                 </div>
                 <SectionContent
+                  useSave={saveBlog}
                   {...section.subSections.right}
                   handleBackgroundColorChange={(value) =>
                     handleBackgroundColorChange(value, index, "right")
@@ -471,6 +374,13 @@ const BlogEditor: React.FC<TAllProps> = (props) => {
                   handleImageUpload={(file) =>
                     hanldeContentImageUpload(file, index, "right")
                   }
+                  handleCodeThemeChange={(value) =>
+                    handleCodeThemeChange(value, index, "right")
+                  }
+                  handleCodeLanguageChange={(value) =>
+                    handleCodeLanguageChange(value, index, "right")
+                  }
+                  handleAdjustImageSize={(value)=>handleAdjustImageChange(value, index, "center")}
                 />
               </div>
               <div style={{ marginTop: "20px" }}>
@@ -479,7 +389,7 @@ const BlogEditor: React.FC<TAllProps> = (props) => {
                   danger
                   style={{ width: "100%" }}
                   icon={<MinusCircleOutlined />}
-                  onClick={() => props.removeSection(index)}
+                  onClick={() => {props.removeSection(index); saveBlog();}}
                 >
                   Remove
                 </Button>
@@ -492,7 +402,10 @@ const BlogEditor: React.FC<TAllProps> = (props) => {
         type="primary"
         size="large"
         icon={<PlusCircleOutlined />}
-        onClick={props.addSection}
+        onClick={() => {
+          props.addSection();
+          saveBlog();
+        }}
       >
         Add Section
       </Button>

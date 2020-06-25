@@ -25,6 +25,11 @@ const Navbar: React.SFC<RouteComponentProps<undefined> & INavbarProps> = (
     return "0";
   };
 
+  const handleLogout = () => {
+    props.onLogoutClick && props.onLogoutClick();
+    props.history.push('/home');
+  }
+
   const selectedKey = getDefaultSelectedKey();
   return (
     <Header style={{ position: "fixed", zIndex: 1, width: "100%" }}>
@@ -54,7 +59,7 @@ const Navbar: React.SFC<RouteComponentProps<undefined> & INavbarProps> = (
                   )}
 
                   <Menu.Item icon={<SettingOutlined />} key="sub2">Settings</Menu.Item>
-                  <Menu.Item key="sub3" icon={<LogoutOutlined />} onClick={props.onLogoutClick}>Logout</Menu.Item>
+                  <Menu.Item key="sub3" icon={<LogoutOutlined />} onClick={handleLogout}>Logout</Menu.Item>
                 </Menu.ItemGroup>
               </SubMenu>
             )}

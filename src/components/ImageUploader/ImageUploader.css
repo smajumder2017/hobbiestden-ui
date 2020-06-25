@@ -1,0 +1,26 @@
+.imageUploadContainer {
+  border: 1px dashed #bdbdbd;
+  border-radius: 5px;
+  padding: 10px;
+  background-color: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.hidden {
+  width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
+
+.contentImage {
+  height: 90px;
+  object-fit: contain;
+}

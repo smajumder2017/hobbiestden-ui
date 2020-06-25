@@ -1,18 +1,22 @@
 import React from "react";
 import { IBlogSections, IContent } from "../../models/CreateBlogModel";
 import parse from "html-react-parser";
-
-import "./Sections.css";
+import SyntaxHighlighter from 'react-syntax-highlighter';
 import ReactPlayer from "react-player";
+
+import { docco, atomOneDark, atomOneLight } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import "./Sections.css";
+
 
 interface IContentOwnProps {
   className: string;
   content: IContent;
   style: {[key: string]: { backgroundColor?: string; border?: string; flex: number };}
+  imageSize?: string | null;
 }
 
 export const SectionContents: React.FC<IContentOwnProps> = (props) => {
-  console.log(props.style);
+
   if (props.content.contentType === "text") {
     return (
       <div className={props.className} style={props.style['text']}>
@@ -25,7 +29,7 @@ export const SectionContents: React.FC<IContentOwnProps> = (props) => {
       <div className={props.className} style={props.style['image']}>
         <img
           src={props.content.contentValue}
-          style={{ width: "100%", objectFit: "contain" }}
+          style={{ width:  props.imageSize &&  props.imageSize !=="0" ? props.imageSize+'px' : "100%", objectFit: "contain" }}
           alt=""
         />
       </div>
@@ -35,6 +39,25 @@ export const SectionContents: React.FC<IContentOwnProps> = (props) => {
     return (
       <div className={props.className} style={props.style['video']}>
         <ReactPlayer width="100%" url={props.content.contentValue} />
+      </div>
+    );
+  }
+  if (props.content.contentType === "code") {
+    let style: any = docco;
+    if(props.content.contentMeta.codeTheme === 'Docco') {
+      style = docco;
+    }
+    if(props.content.contentMeta.codeTheme === 'Atom One Dark') {
+      style = atomOneDark;
+    }
+    if(props.content.contentMeta.codeTheme === 'Atom One Light') {
+      style = atomOneLight;
+    }
+    return (
+      <div className={props.className} style={props.style['code']}>
+        <SyntaxHighlighter language={props.content.contentMeta.codeLanguage} style={style} showLineNumbers>
+          {props.content.contentValue}
+        </SyntaxHighlighter>
       </div>
     );
   }
@@ -99,6 +122,7 @@ export const Sections: React.FC<ISectionOwnProps> = (props) => {
                   },
                   image: { flex: getContentPresence(seckey) },
                   video: { flex: getContentPresence(seckey) },
+                  code: {flex: getContentPresence(seckey)}
                 };
                 return (
                   <SectionContents
@@ -106,6 +130,7 @@ export const Sections: React.FC<ISectionOwnProps> = (props) => {
                     content={section.subSections[seckey]}
                     className={seckey}
                     style={styles}
+                    imageSize={section.subSections[seckey].contentMeta.imageWidth}
                   />
                 );
               })}
