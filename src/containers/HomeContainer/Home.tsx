@@ -1,30 +1,24 @@
-import React from "react";
-import { Carousel, Row, Col } from "antd";
-
-import "./Home.css";
-
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useEffect } from "react";
+import { Carousel, Row, Col, Tag } from "antd";
+import { IHobbiestDenAppState } from "../../redux/reducers";
+import BlogActions from "../../redux/actions/blogsActions";
+import { GetConnectDispatchPropsType } from "../../utils/actionCreators";
+import { Dispatch, bindActionCreators } from "redux";
+import { connect } from "react-redux";
+import ImageViewer from "../../components/ImageViewer";
 import { List, Avatar, Space } from "antd";
 import { MessageOutlined, LikeOutlined, StarOutlined } from "@ant-design/icons";
+import parse from "html-react-parser";
+import "./Home.css";
+import { IBlogSections } from "../../models/CreateBlogModel";
+import { Link } from "react-router-dom";
 
-const listData: Array<{
-  href: string;
-  title: string;
-  avatar: string;
-  description: string;
-  content: string;
-}> = [];
+type TStateProps = ReturnType<typeof mapStateToProps>;
+type TBindActionCreators = typeof BlogActions;
+type TDispatchProps = GetConnectDispatchPropsType<TBindActionCreators>;
 
-for (let i = 0; i < 23; i++) {
-  listData.push({
-    href: "https://ant.design",
-    title: `ant design part ${i}`,
-    avatar: "https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png",
-    description:
-      "Ant Design, a design language for background applications, is refined by Ant UED Team.",
-    content:
-      "We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their product prototypes beautifully and efficiently.",
-  });
-}
+type TAllProps = TStateProps & TDispatchProps;
 
 const IconText = (args: any) => (
   <Space>
@@ -32,10 +26,57 @@ const IconText = (args: any) => (
     {args.text}
   </Space>
 );
-const HomeContainer = () => {
-  function onChange(currentIndex: number) {
-    
-  }
+const HomeContainer: React.FC<TAllProps> = (props) => {
+  function onChange(currentIndex: number) {}
+
+  useEffect(() => {
+    (async () => {
+      try {
+        await props.fetchBlogs({ status: "APPROVED" });
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+  }, []);
+
+  const getContent = (sections: IBlogSections[]): string => {
+    let text = "";
+    for (const section of sections) {
+      if (
+        section.subSections["left"].contentType === "text" ||
+        section.subSections["center"].contentType === "text" ||
+        section.subSections["right"].contentType === "text"
+      ) {
+        text =
+          section.subSections["left"].contentValue ||
+          section.subSections["center"].contentValue ||
+          section.subSections["right"].contentValue;
+        break;
+      }
+    }
+    return text;
+  };
+
+  const data = props.blogs.data
+    ? props.blogs.data.map((blog) => ({
+        title: blog.content.title,
+        subTitle: blog.content.subTitle,
+        image:
+          blog.thumbnailImage ||
+          "https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png",
+        status: blog.status,
+        blogId: blog.blogId,
+        category: blog.category,
+        avatar:
+          "https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png",
+        content: getContent(blog.content.sections),
+        avatarImage: blog.creator.image,
+        userShortName:
+          blog.creator.firstName.charAt(0) +
+          " " +
+          blog.creator.lastName.charAt(0),
+      }))
+    : [];
 
   return (
     <>
@@ -55,9 +96,9 @@ const HomeContainer = () => {
       </Carousel>
       <div className="home-content">
         <Row>
-          <Col span={18}>
-            <h2>Latest Blogs</h2>
+          <Col span={14}>
             <List
+              header={<h2>Latest Blogs</h2>}
               itemLayout="vertical"
               size="large"
               pagination={{
@@ -66,12 +107,7 @@ const HomeContainer = () => {
                 },
                 pageSize: 3,
               }}
-              dataSource={listData}
-              footer={
-                <div>
-                  <b>ant design</b> footer part
-                </div>
-              }
+              dataSource={data}
               renderItem={(item) => (
                 <List.Item
                   key={item.title}
@@ -93,28 +129,70 @@ const HomeContainer = () => {
                     />,
                   ]}
                   extra={
-                    <img
-                      width={272}
-                      alt="logo"
-                      src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+                    <ImageViewer
+                      src={item.image}
+                      style={{
+                        width: "272px",
+                        height: "170px",
+                        objectFit: "contain",
+                      }}
                     />
                   }
                 >
                   <List.Item.Meta
-                    avatar={<Avatar src={item.avatar} />}
-                    title={<a href={item.href}>{item.title}</a>}
-                    description={item.description}
+                    avatar={item.avatarImage ? (
+                      <Avatar src={item.avatarImage} />
+                    ) : (
+                      <Avatar>{item.userShortName}</Avatar>
+                    )}
+                    title={
+                      <Link
+                        to={`/blog?title=${item.title
+                          .split(" ")
+                          .join("-")}`}
+                      >
+                        {item.title}
+                      </Link>
+                    }
+                    description={item.subTitle}
                   />
-                  {item.content}
+                  <div>
+                    {item.category && (
+                      <div>
+                        <Tag
+                          style={{ textTransform: "capitalize" }}
+                          color="blue"
+                        >
+                          {item.category}
+                        </Tag>
+                      </div>
+                    )}
+                  </div>
                 </List.Item>
               )}
             />
           </Col>
-          <Col span={6}>col</Col>
+          <Col span={10}>col</Col>
         </Row>
       </div>
     </>
   );
 };
 
-export default HomeContainer;
+const mapStateToProps = (state: IHobbiestDenAppState) => {
+  return {
+    auth: state.auth,
+    blogs: state.blogs,
+  };
+};
+
+const mapDispatchToProps = (dispatch: Dispatch) =>
+  bindActionCreators<TBindActionCreators, TDispatchProps>(
+    BlogActions,
+    dispatch
+  );
+
+export default connect<TStateProps, TDispatchProps, {}, IHobbiestDenAppState>(
+  mapStateToProps,
+  mapDispatchToProps
+)(HomeContainer);

@@ -12,6 +12,7 @@ export interface IFetchSession {
   firstName: string;
   lastName: string;
   roles: string[];
+  image?: string;
 }
 
 export interface ICreateUserRequest {email: string, firstName: string, lastName: string; password: string}

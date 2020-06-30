@@ -251,6 +251,7 @@ export const SectionContent: React.FC<ISectionContentProps> = (props) => {
               <Select.Option value="java">Java</Select.Option>
               <Select.Option value="c++">C++</Select.Option>
               <Select.Option value="c">C</Select.Option>
+              <Select.Option value="shell">Shell</Select.Option>
             </Select>
             
           </div>
@@ -272,6 +273,7 @@ export const SectionContent: React.FC<ISectionContentProps> = (props) => {
         drwaerState={editorState}
         handleClose={handleEditorClose}
         onEditorChange={handleContentChange}
+        value={props.contentValue}
       />
     </div>
   );

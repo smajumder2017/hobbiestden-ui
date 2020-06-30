@@ -26,6 +26,13 @@ export const login = (apiArgs: IAuthRequest) => {
   );
 };
 
+export const facebookLogin = (apiArgs: {email: string; firstName: string; lastName: string; image: string}) => {
+  return http.post<{email: string; firstName: string; lastName: string; image: string}, IAuthResponse>(
+    `${config.backendServiceUrl}auth/facebooklogin`,
+    apiArgs
+  );
+};
+
 export const fetchSession = () => {
   return http.get<{}, IFetchSession>(`${config.backendServiceUrl}auth/session`);
 };
@@ -65,3 +72,15 @@ export const fetchAllBlogsByUser = () => {
     `${config.backendServiceUrl}blog/userBlogs`
   );
 };
+
+export const fetchBlogsByStatus = (args: {status: string}) => {
+  return http.get<{}, IBlogResponse[]>(
+    `${config.backendServiceUrl}blog/allBlogs`, {...args}
+  );
+};
+
+export const fetchAllCategories = () => {
+  return http.get<{}, Array<{category: string; tags: string[]}>>(
+    `${config.backendServiceUrl}category`,
+  );
+}

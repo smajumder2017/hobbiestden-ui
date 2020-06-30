@@ -1,17 +1,17 @@
-import React from 'react';
-import { Avatar, Button } from 'antd';
+import React from "react";
+import { Avatar, Button } from "antd";
 import {
   TwitterOutlined,
   FacebookFilled,
   LinkedinFilled,
 } from "@ant-design/icons";
 
-import './BloggerInfo.css';
+import "./BloggerInfo.css";
 
 interface IOwnProps {
-  userName: string,
-  blogDate: string,
-  userImageUrl?: string
+  userName: string;
+  blogDate: string;
+  userImageUrl?: string;
 }
 
 export const BloggerInfo: React.FC<IOwnProps> = (props) => {
@@ -19,10 +19,14 @@ export const BloggerInfo: React.FC<IOwnProps> = (props) => {
     <div className="infoContainer">
       <div className="bloggerInfo">
         <div>
-          <Avatar
-            size={100}
-            src={props.userImageUrl || "https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"}
-          />
+          {props.userImageUrl ? (
+            <Avatar size={80} src={props.userImageUrl} />
+          ) : (
+            <Avatar size={80}>
+              {props.userName.split(" ")[0][0] +
+                props.userName.split(" ")[1][0]}
+            </Avatar>
+          )}
         </div>
         <div className="bloggerInfoContainer">
           <div className="bloggerName">{props.userName}</div>

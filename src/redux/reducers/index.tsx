@@ -2,13 +2,15 @@ import { combineReducers } from "redux";
 import { auth } from "./authReducer";
 import { createBlog } from "./createBlogReducer";
 import {blogger} from './bloggerReducer';
+import {blogs} from './blogsReducer';
 
 import { ReducerMappedState } from "../../utils/actionCreators";
 
 const reducers = {
   auth,
   createBlog,
-  blogger
+  blogger,
+  blogs
 };
 
 export interface IReducerInitialState<T, U = any> {

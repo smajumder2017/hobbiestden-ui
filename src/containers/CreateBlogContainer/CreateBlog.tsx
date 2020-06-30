@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from 'react';
-import { Row, Col, Button } from 'antd';
+import { Row, Col, Button, Spin } from 'antd';
 import BlogEditor from './BlogEditor/BlogEditor';
 import BlogPreviewer from './Previewer/PreviewComponent';
 import CreateBlogActions from '../../redux/actions/createBlogActions';
@@ -43,10 +43,12 @@ const CreateBlogCotainer: React.FC<TAllProps> = (props) => {
           <Button type="primary" onClick={()=>props.history.push('/blogger')}>Done Editing</Button>
           </div>
         </div>
-        <BlogPreviewer />
+        { props.createBlog.data?.title ? <BlogPreviewer /> : <Spin />}
       </Col>
       <Col span={6}>
-        <BlogEditor blogId={blogid} />
+        {
+          props.createBlog.data?.title ? <BlogEditor blogId={blogid} /> : <Spin />
+        }
       </Col>
     </Row>
     </>

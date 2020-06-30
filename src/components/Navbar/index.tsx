@@ -1,8 +1,15 @@
 import React from "react";
 import { withRouter, RouteComponentProps } from "react-router";
 import { Link } from "react-router-dom";
-import { Layout, Menu } from "antd";
-import { LoginOutlined, UserOutlined, FileAddOutlined, LogoutOutlined, SettingOutlined, HomeOutlined } from "@ant-design/icons";
+import { Layout, Menu, Avatar } from "antd";
+import {
+  LoginOutlined,
+  UserOutlined,
+  FileAddOutlined,
+  LogoutOutlined,
+  HomeOutlined,
+  DashboardOutlined,
+} from "@ant-design/icons";
 
 const { SubMenu } = Menu;
 
@@ -11,6 +18,7 @@ const { Header } = Layout;
 interface INavbarProps {
   userName?: string;
   roles?: string[];
+  image?: string;
   onLoginClick?: () => void;
   onLogoutClick?: () => void;
 }
@@ -19,7 +27,7 @@ const Navbar: React.SFC<RouteComponentProps<undefined> & INavbarProps> = (
   props
 ) => {
   const getDefaultSelectedKey = (): string => {
-    if (props.history.location.pathname === "/home") return "1";
+    if (props.history.location.pathname === "/") return "1";
     if (props.history.location.pathname === "/hello2") return "2";
 
     return "0";
@@ -27,8 +35,8 @@ const Navbar: React.SFC<RouteComponentProps<undefined> & INavbarProps> = (
 
   const handleLogout = () => {
     props.onLogoutClick && props.onLogoutClick();
-    props.history.push('/home');
-  }
+    props.history.push("/");
+  };
 
   const selectedKey = getDefaultSelectedKey();
   return (
@@ -37,7 +45,7 @@ const Navbar: React.SFC<RouteComponentProps<undefined> & INavbarProps> = (
         <div className="logo" />
         <Menu theme="dark" mode="horizontal" selectedKeys={[selectedKey]}>
           <Menu.Item key="1" icon={<HomeOutlined />}>
-            <Link to={"/home"}>Home</Link>
+            <Link to={"/"}>Home</Link>
           </Menu.Item>
           <Menu.Item key="2">
             <Link to={"/hello2"}>Nav2</Link>
@@ -52,14 +60,43 @@ const Navbar: React.SFC<RouteComponentProps<undefined> & INavbarProps> = (
                 Login
               </Menu.Item>
             ) : (
-              <SubMenu icon={<UserOutlined />} title={props.userName}>
+              <SubMenu
+                icon={
+                  props.image ? (
+                    <Avatar style={{ marginRight: "10px" }} src={props.image} />
+                  ) : (
+                    <UserOutlined />
+                  )
+                }
+                title={props.userName}
+              >
                 <Menu.ItemGroup>
                   {props.roles?.includes("ADMIN") && (
-                    <Menu.Item icon={<FileAddOutlined />} key="sub1"> <Link to={"/blogger"}>Blogger</Link></Menu.Item>
+                    <Menu.Item icon={<DashboardOutlined />} key="sub0">
+                      <Link to={"/dashboard"}>Dashboard</Link>
+                    </Menu.Item>
+                  )}
+                  {props.roles?.includes("ADMIN") ||
+                  props.roles?.includes("BLOGGER") ? (
+                    <Menu.Item icon={<FileAddOutlined />} key="sub1">
+                      <Link to={"/blogger"}>Blogger</Link>
+                    </Menu.Item>
+                  ) : (
+                    <Menu.Item icon={<FileAddOutlined />} key="sub1">
+                      <Link to={"/blogger/register"}>Upgrade</Link>
+                    </Menu.Item>
                   )}
 
-                  <Menu.Item icon={<SettingOutlined />} key="sub2">Settings</Menu.Item>
-                  <Menu.Item key="sub3" icon={<LogoutOutlined />} onClick={handleLogout}>Logout</Menu.Item>
+                  <Menu.Item icon={<UserOutlined />} key="sub2">
+                    Profile
+                  </Menu.Item>
+                  <Menu.Item
+                    key="sub3"
+                    icon={<LogoutOutlined />}
+                    onClick={handleLogout}
+                  >
+                    Logout
+                  </Menu.Item>
                 </Menu.ItemGroup>
               </SubMenu>
             )}
@@ -69,6 +106,5 @@ const Navbar: React.SFC<RouteComponentProps<undefined> & INavbarProps> = (
     </Header>
   );
 };
-
 
 export default withRouter(Navbar);

@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
 import { Switch, Route, BrowserRouter as Router } from "react-router-dom";
-import { Layout, Modal } from "antd";
+import { Layout, Modal, Result, Button } from "antd";
 import AuthActions from "../redux/actions/authActions";
 import { GetConnectDispatchPropsType } from "../utils/actionCreators";
 import { IHobbiestDenAppState } from "../redux/reducers";
@@ -13,6 +13,7 @@ import HomeContainer from "../containers/HomeContainer";
 import Login from "../components/Login";
 import CreateBlogContainer from "../containers/CreateBlogContainer";
 import BloggerContainer from "../containers/BloggerContainer";
+import BlogComponent from './BlogContainer';
 import Footer from "../components/Footer";
 
 import "antd/dist/antd.css";
@@ -53,10 +54,11 @@ export const App: React.FC<TAllProps> = (props) => {
           roles={props.auth.data?.roles}
           onLoginClick={handleOnLoginClick}
           onLogoutClick={handleLogout}
+          image={props.auth.data?.image}
         />
         <Layout.Content style={{ marginTop: 64 }}>
           <Switch>
-            <Route path="/home" render={(routerProps) => <HomeContainer />} />
+            <Route exact path="/" render={(routerProps) => <HomeContainer {...routerProps} />} />
             <Route path="/hello2" render={(routerProps) => <div>Hello2</div>} />
             {props.auth.authenticated && (
               <Route
@@ -72,6 +74,22 @@ export const App: React.FC<TAllProps> = (props) => {
                 render={(routerProps) => <BloggerContainer {...routerProps} />}
               />
             )}
+              <Route
+                path="/blog"
+                render={(routerProps) => (
+                  <BlogComponent {...routerProps} />
+                )}
+              />
+            <Route
+              render={() => (
+                <Result
+                  status="404"
+                  title="404"
+                  subTitle="Sorry, the page you visited does not exist."
+                  extra={<Button type="primary">Back Home</Button>}
+                />
+              )}
+            />
             {/* <Route path="/blogger/create/:blogid" render={(routerProps) => <CreateBlogContainer {...routerProps} />} /> */}
           </Switch>
         </Layout.Content>

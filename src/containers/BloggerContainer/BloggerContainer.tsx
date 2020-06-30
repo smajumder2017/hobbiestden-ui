@@ -56,16 +56,24 @@ const BloggerContainer: React.FC<TAllProps> = (props) => {
   const [createBlogModal, setCreateBlogModal] = useState(false);
   const [createBlogForm, setCreateBlogForm] = useState<{
     title: string;
-    category: string;
+    category?: string;
     thumbnailImage: string;
   }>({
     title: "",
-    category: "technology",
+    category: undefined,
     thumbnailImage: "",
   });
+  const [categories, setCategories] = useState<string[]>([]);
+  const [categorySearch, setCategorySearch] = useState("");
+
   useEffect(() => {
     (async () => {
       await props.fetchBlogs({});
+      const {
+        payload: { res },
+      } = await props.fetchCategories({});
+      const categoryList = res.map((item) => item.category);
+      setCategories(categoryList);
     })();
   }, []);
 
@@ -95,18 +103,27 @@ const BloggerContainer: React.FC<TAllProps> = (props) => {
   const handleCreateBlog = async () => {
     setLoader(true);
     try {
-      await props.createBlog(createBlogForm);
+      const {payload:{res:{blogId}}} = await props.createBlog(createBlogForm);
       notification.open({
         placement: "bottomLeft",
         message: "Blog Created",
         description: "Start editing your blog...",
         type: "success",
       });
+      props.history.push(`/blogger/create/${blogId}`)
     } catch (error) {
       console.log(error);
     }
     setLoader(false);
     setCreateBlogModal(false);
+  };
+
+  const handleSearch = (value: string) => {
+    if (value) {
+      setCategorySearch(value);
+    } else {
+      setCategorySearch("");
+    }
   };
 
   const data = props.blogger.data
@@ -119,6 +136,11 @@ const BloggerContainer: React.FC<TAllProps> = (props) => {
         status: blog.status,
         blogId: blog.blogId,
         category: blog.category,
+        avatarImage: blog.creator.image,
+        userShortName:
+          blog.creator.firstName.charAt(0) +
+          " " +
+          blog.creator.lastName.charAt(0),
       }))
     : [];
 
@@ -208,17 +230,16 @@ const BloggerContainer: React.FC<TAllProps> = (props) => {
                         objectFit: "contain",
                       }}
                     />
-                    // <img
-                    //   width={272}
-                    //   alt="logo"
-                    //   src={item.image}
-                    //   style={{ height: "170px", objectFit: "contain" }}
-                    // />
                   }
                 >
                   <List.Item.Meta
                     avatar={
-                      <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
+                      item.avatarImage ? (
+                        <Avatar src={item.avatarImage} />
+                      ) : (
+                        <Avatar>{item.userShortName}</Avatar>
+                      )
+                      // <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
                     }
                     title={item.title}
                     description={item.subTitle}
@@ -296,17 +317,24 @@ const BloggerContainer: React.FC<TAllProps> = (props) => {
                 <label>Category</label>
               </div>
               <Select
-                defaultValue={"technology"}
+                showSearch
                 value={createBlogForm.category}
+                placeholder={"Choose Category of Your Blog"}
+                // style={this.props.style}
+                defaultActiveFirstOption={false}
+                showArrow={false}
+                filterOption={false}
+                onSearch={handleSearch}
                 onChange={(value) => handleCategoryChange(value)}
+                notFoundContent={null}
               >
-                <Select.Option value="travel">Travel</Select.Option>
-                <Select.Option value="technology">Technolgy</Select.Option>
-                <Select.Option value="music">Music</Select.Option>
-                <Select.Option value="marketing">Marketing</Select.Option>
-                <Select.Option value="informational">
-                  Informational
-                </Select.Option>
+                {categories
+                  .filter((item) => item.includes(categorySearch))
+                  .map((item) => (
+                    <Select.Option key={item} value={item}>
+                      {item}
+                    </Select.Option>
+                  ))}
               </Select>
             </div>
           </Form.Item>

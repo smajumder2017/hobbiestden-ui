@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
-import { Button, Input, Divider, Collapse, Form, TreeSelect } from "antd";
+import { Button, Input, Divider, Collapse, Form, TreeSelect, Spin } from "antd";
 import { PlusCircleOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import { IHobbiestDenAppState } from "../../../redux/reducers";
 import { Dispatch, bindActionCreators } from "redux";
@@ -31,6 +31,9 @@ type TAllProps = TStateProps & TDispatchProps & IOwnProps;
 const BlogEditor: React.FC<TAllProps> = (props) => {
   const [tags, setTags] = useState<string[]>([]);
   const [loader, setLoader] = useState(false);
+  const [activeSection, setActiveSection] = useState<
+    string | number | string[]
+  >(["0"]);
   useEffect(() => {
     (async () => {
       if (props.createBlog.data) {
@@ -43,6 +46,14 @@ const BlogEditor: React.FC<TAllProps> = (props) => {
     props.createBlog.data?.subTitle,
     props.createBlog.data?.coverImageUrl,
   ]);
+
+  useEffect(() => {
+    if (props.createBlog.data) {
+      setActiveSection([
+        (props.createBlog.data.sections.length - 1).toString(),
+      ]);
+    }
+  }, []);
 
   const saveBlog = () => {
     if (props.createBlog.data) {
@@ -146,6 +157,7 @@ const BlogEditor: React.FC<TAllProps> = (props) => {
     sectionIndex: number,
     subSection: "left" | "right" | "center"
   ) => {
+    console.log(value);
     const contentMeta: IContentMeta = {
       backgroundColor: null,
       borderColor: null,
@@ -275,7 +287,11 @@ const BlogEditor: React.FC<TAllProps> = (props) => {
         <Divider orientation="left">
           <h4>Sections</h4>
         </Divider>
-        <Collapse defaultActiveKey={[0]} bordered={false}>
+        <Collapse
+          activeKey={activeSection}
+          bordered={false}
+          onChange={(key) => setActiveSection(key)}
+        >
           {props.createBlog.data?.sections.map((section, index) => (
             <Panel
               key={index}
@@ -284,6 +300,7 @@ const BlogEditor: React.FC<TAllProps> = (props) => {
               <Input
                 placeholder="Enter Heading"
                 addonBefore="Heading"
+                value={section.header || ""}
                 onChange={(e) =>
                   handleSectionHeadingChange(e.target.value, index)
                 }
@@ -318,7 +335,9 @@ const BlogEditor: React.FC<TAllProps> = (props) => {
                   handleCodeLanguageChange={(value) =>
                     handleCodeLanguageChange(value, index, "left")
                   }
-                  handleAdjustImageSize={(value)=>handleAdjustImageChange(value, index, "left")}
+                  handleAdjustImageSize={(value) =>
+                    handleAdjustImageChange(value, index, "left")
+                  }
                 />
               </div>
               <div>
@@ -349,7 +368,9 @@ const BlogEditor: React.FC<TAllProps> = (props) => {
                   handleCodeLanguageChange={(value) =>
                     handleCodeLanguageChange(value, index, "center")
                   }
-                  handleAdjustImageSize={(value)=>handleAdjustImageChange(value, index, "center")}
+                  handleAdjustImageSize={(value) =>
+                    handleAdjustImageChange(value, index, "center")
+                  }
                 />
               </div>
               <div>
@@ -380,7 +401,9 @@ const BlogEditor: React.FC<TAllProps> = (props) => {
                   handleCodeLanguageChange={(value) =>
                     handleCodeLanguageChange(value, index, "right")
                   }
-                  handleAdjustImageSize={(value)=>handleAdjustImageChange(value, index, "center")}
+                  handleAdjustImageSize={(value) =>
+                    handleAdjustImageChange(value, index, "right")
+                  }
                 />
               </div>
               <div style={{ marginTop: "20px" }}>
@@ -389,7 +412,10 @@ const BlogEditor: React.FC<TAllProps> = (props) => {
                   danger
                   style={{ width: "100%" }}
                   icon={<MinusCircleOutlined />}
-                  onClick={() => {props.removeSection(index); saveBlog();}}
+                  onClick={() => {
+                    props.removeSection(index);
+                    saveBlog();
+                  }}
                 >
                   Remove
                 </Button>

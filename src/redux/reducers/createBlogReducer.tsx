@@ -277,7 +277,7 @@ export function createBlog(
             subSection
           ].contentMeta.codeTheme = codeTheme;
         }
-        if (codeTheme) {
+        if (codeLanguage) {
           state.data.sections[sectionIndex].subSections[
             subSection
           ].contentMeta.codeLanguage = codeLanguage;

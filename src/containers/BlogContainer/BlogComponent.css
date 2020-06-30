@@ -1,11 +1,8 @@
-.preview-container {
+.blog-container {
   padding: 20px;
-  display: flex;
-  flex-direction: column;
+  padding-top: 40px;
   font-family: 'Merriweather', serif;
-  min-height: calc(100vh - 64px - 42px);
-  max-height: calc(100vh - 64px - 42px);
-  overflow-y: scroll;
+  min-height: calc(100vh - 64px -42px);
 }
 
 .preview-container .title {

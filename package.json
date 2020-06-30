@@ -20,10 +20,12 @@
     "draft-js-export-html": "^1.4.1",
     "history": "^5.0.0",
     "html-react-parser": "^0.13.0",
+    "html-to-draftjs": "^1.5.0",
     "react": "^16.13.1",
     "react-cookies": "^0.1.1",
     "react-dom": "^16.13.1",
     "react-draft-wysiwyg": "^1.14.5",
+    "react-facebook-login": "^4.1.1",
     "react-image-crop": "^8.6.4",
     "react-player": "^2.3.1",
     "react-redux": "^7.2.0",
@@ -38,7 +40,7 @@
     "typescript": "~3.7.2"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "react-scripts start --PORT=4000",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -60,7 +62,9 @@
   },
   "devDependencies": {
     "@types/history": "^4.7.6",
+    "@types/html-to-draftjs": "^1.4.0",
     "@types/react-cookies": "^0.1.0",
+    "@types/react-facebook-login": "^4.1.2",
     "@types/react-image-crop": "^8.1.2",
     "@types/react-redux": "^7.1.9",
     "@types/react-router": "^5.1.7",

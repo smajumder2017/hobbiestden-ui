@@ -17,6 +17,13 @@ interface IContentOwnProps {
 
 export const SectionContents: React.FC<IContentOwnProps> = (props) => {
 
+  if (props.content.contentType === "none") {
+    return (
+      <div className={props.className} style={props.style['none']}>
+        {parse(props.content.contentValue)}
+      </div>
+    );
+  }
   if (props.content.contentType === "text") {
     return (
       <div className={props.className} style={props.style['text']}>
@@ -55,7 +62,7 @@ export const SectionContents: React.FC<IContentOwnProps> = (props) => {
     }
     return (
       <div className={props.className} style={props.style['code']}>
-        <SyntaxHighlighter language={props.content.contentMeta.codeLanguage} style={style} showLineNumbers>
+        <SyntaxHighlighter wrapLines language={props.content.contentMeta.codeLanguage} style={style} customStyle={{overflowX: 'scroll'}} showLineNumbers>
           {props.content.contentValue}
         </SyntaxHighlighter>
       </div>
@@ -74,13 +81,13 @@ export const Sections: React.FC<ISectionOwnProps> = (props) => {
       {props.sections.map((section, index) => {
         const getBackgoundColor = (side: string): string => {
           return (
-            section.subSections[side].contentMeta.backgroundColor || "#FFF"
+            section.subSections[side].contentMeta.backgroundColor || "none"
           );
         };
         const getBorderColor = (side: string): string => {
           return (
             "1px solid " + section.subSections[side].contentMeta.borderColor ||
-            "#FFF"
+            "none"
           );
         };
         const left = section.subSections.left.contentType !== "none";
@@ -94,7 +101,11 @@ export const Sections: React.FC<ISectionOwnProps> = (props) => {
         if (left && center && !right) {
           contentMap.left = 1;
           contentMap.center = 2;
-        } else if (!left && center && right) {
+        } else if (left && !center && right) {
+          contentMap.left = 2;
+          contentMap.center = 1;
+        }
+        else if (!left && center && right) {
           contentMap.right = 1;
           contentMap.center = 2;
         } else if (left && center && right) {
@@ -114,15 +125,16 @@ export const Sections: React.FC<ISectionOwnProps> = (props) => {
             <div className="section-header">{section.header}</div>
             <div className="section-content">
               {Object.keys(section.subSections).map((seckey: string, index) => {
-                const styles: {[key: string]: { backgroundColor?: string; border?: string; flex: number };} = {
+                const styles: {[key: string]: { backgroundColor?: string; border?: string; flex: number, display?: string, justifyContent?: string, alignItems?: string, overflowX?: string };} = {
                   text: {
                     backgroundColor: getBackgoundColor(seckey),
                     border: getBorderColor(seckey),
                     flex: getContentPresence(seckey),
                   },
-                  image: { flex: getContentPresence(seckey) },
+                  image: { flex: getContentPresence(seckey), display: 'flex', justifyContent: 'center', alignItems: 'center' },
                   video: { flex: getContentPresence(seckey) },
-                  code: {flex: getContentPresence(seckey)}
+                  code: {flex: getContentPresence(seckey), overflowX: 'auto'},
+                  none: {flex: 0}
                 };
                 return (
                   <SectionContents

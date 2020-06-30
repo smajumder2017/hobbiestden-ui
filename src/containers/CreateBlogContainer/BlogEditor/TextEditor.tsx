@@ -1,8 +1,9 @@
 import React, {useState} from "react";
 import { Drawer, Button } from "antd";
-import { EditorState } from "draft-js";
+import { EditorState, ContentState, convertToRaw } from "draft-js";
 import { Editor } from "react-draft-wysiwyg";
 import { stateToHTML, Options } from "draft-js-export-html";
+import htmlToDraft from 'html-to-draftjs';
 
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 
@@ -13,6 +14,7 @@ let options: ICustomOptions = {
   inlineStyles: {
     // Override default element (`strong`).
     BOLD: { element: "b" },
+
   },
   inlineStyleFn: (styles: any) => {
     let colorKey = 'color-';
@@ -23,11 +25,16 @@ let options: ICustomOptions = {
     if(color) style.color = color.replace(colorKey, '');
     if(fontSize) style.fontSize = fontSize.replace(fontSizeKey, '');
 
-    if (color || fontSize) {
+    if (color) {
       return {
-        element: 'span',
+        // element: 'span',
         style,
       };
+    }
+    if(fontSize) {
+      return {
+        style,
+      }
     }
   },
   blockStyleFn: (block) => {
@@ -38,6 +45,16 @@ let options: ICustomOptions = {
         },
       }
     }
+    if (block.getType().endsWith('-list-item')) {
+      let fontSizeKey = 'fontsize-';
+      let fontSize = block.getInlineStyleAt(1).filter((value: any) => value.startsWith(fontSizeKey)).first();
+      const style: {color?:string, fontSize?: string, marginBottom?:string} = {};
+      if(fontSize) style.fontSize = fontSize.replace(fontSizeKey, '');
+      style.marginBottom = '5px'
+      return {
+        style
+      }
+    }
   }
 };
 
@@ -45,14 +62,18 @@ interface ITextEditor {
   drwaerState: boolean;
   handleClose: () => void;
   onEditorChange: (editorHtmlState: string)=> void;
+  value?: string;
 }
 
 export const TextEditor: React.FC<ITextEditor> = (props) => {
-  const [editorState, setEditorState] = useState(EditorState.createEmpty());
+  const blocksFromHtml = htmlToDraft(props.value || '');
+  const { contentBlocks, entityMap } = blocksFromHtml;
+  const contentState = ContentState.createFromBlockArray(contentBlocks, entityMap);
+  const [editorState, setEditorState] = useState(EditorState.createWithContent(contentState));
 
   const onEditorStateChange = (editorState: EditorState) => {
     setEditorState(editorState);
-    // console.log(convertToRaw(editorState.getCurrentContent()));
+    console.log(convertToRaw(editorState.getCurrentContent()));
     // console.log(stateToHTML(editorState.getCurrentContent(), options));
     props.onEditorChange(stateToHTML(editorState.getCurrentContent(), options));
   };
