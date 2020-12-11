@@ -11,11 +11,15 @@ import { BloggerInfo } from "../../components/BloggerInfo/BloggerInfo";
 
 import "./BlogComponent.css";
 import { queryParamsToObject } from "../../utils/urlUtils";
-import { Row, Col } from "antd";
+import { Row, Col, Divider } from "antd";
+
+import CommentList from "./../../components/Comments/CommentsList";
+
+import ReactGA from 'react-ga';
 
 type TStateProps = ReturnType<typeof mapStateToProps>;
-type TBindActionCreators = typeof BlogActions;
-type TDispatchProps = GetConnectDispatchPropsType<TBindActionCreators>;
+type TBindActionCreator = typeof BlogActions;
+type TDispatchProps = GetConnectDispatchPropsType<TBindActionCreator>;
 
 type TAllProps = TStateProps & TDispatchProps & RouteComponentProps<undefined>;
 
@@ -24,9 +28,11 @@ export const BlogViewComponent: React.FC<TAllProps> = (props) => {
     title: string;
   };
   useEffect(() => {
+    ReactGA.initialize('UA-171424528-1');
+    ReactGA.pageview(window.location.pathname + window.location.search);
     (async () => {
       try {
-        await props.fetchBlogs({ status: "APPROVED" });
+        await props.fetchBlogs({ status: "PUBLISHED" });
       } catch (error) {
         console.log(error);
       }
@@ -35,11 +41,11 @@ export const BlogViewComponent: React.FC<TAllProps> = (props) => {
   const blog =
     props.blogs.data &&
     props.blogs.data.find(
-      (blog) => blog.content.title === title.split('-').join(' ')
+      (blog) => blog.title === title.split('-').join(' ')
     );
   
   if (blog) {
-    const fullName = blog.creator.firstName + " " + blog.creator.lastName
+    const fullName = blog.user.firstName + " " + blog.user.lastName
     return (
       <div className="blog-container">
         <Row>
@@ -54,20 +60,22 @@ export const BlogViewComponent: React.FC<TAllProps> = (props) => {
                     style={{ width: "100%", height: "auto" }}
                   />
                 </div>
-                <BloggerInfo userName={fullName} blogDate="10th June, 2020" userImageUrl={blog.creator.image} />
+                <BloggerInfo userName={fullName} blogDate="10th June, 2020" userImageUrl={blog.user.image} />
               </>
             )}
-            <div className="title">{blog.content.title}</div>
+            <div className="title">{blog.title}</div>
             <div className="subtitle">{blog.content.subTitle}</div>
             {!blog.content.coverImageUrl && (
               <div style={{marginTop: '40px'}}>
-                <BloggerInfo userName={fullName} blogDate="10th June, 2020" userImageUrl={blog.creator.image} />
+                <BloggerInfo userName={fullName} blogDate="10th June, 2020" userImageUrl={blog.user.image} />
               </div>
               
             )}
             {blog.content.sections && (
               <Sections sections={blog.content.sections} />
             )}
+            <Divider />
+            <CommentList blogId={blog.blogId} />
           </Col>
           <Col span={5}></Col>
         </Row>
@@ -85,7 +93,7 @@ const mapStateToProps = (state: IHobbiestDenAppState) => {
 };
 
 const mapDispatchToProps = (dispatch: Dispatch) =>
-  bindActionCreators<TBindActionCreators, TDispatchProps>(
+  bindActionCreators<TBindActionCreator, TDispatchProps>(
     BlogActions,
     dispatch
   );

@@ -7,7 +7,7 @@ const Footer: React.FC<RouteComponentProps> = (props) => {
   if((/\/blogger\/create\/[a-zA-Z0-9]+$/g).test(props.location.pathname)) {
     return null;
   }
-  return<Layout.Footer>Footer</Layout.Footer>
+  return<Layout.Footer style={{backgroundColor: '#2196f3', color: 'white'}}>Footer</Layout.Footer>
 }
 
 export default withRouter(Footer);

@@ -1,5 +1,5 @@
-.home-content {
+.blog-content {
   padding: 10px 50px;
-  height: calc(100vh - 64px);
-  overflow-y: scroll;
+  /* height: calc(100vh - 64px);
+  overflow-y: scroll; */
 }

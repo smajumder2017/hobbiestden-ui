@@ -71,7 +71,7 @@ interface ICreateBlogReducerInitialState
   blogId?: string;
   createdAt?: string;
   updatedAt?: string;
-  status?: "CREATED" | "SUBMITTED" | "APPROVED" | "NOT APPROVED";
+  status?: "CREATED" | "SUBMITTED" | "APPROVED" | "NOT APPROVED" | "PUBLISHED";
 }
 
 const initialState: ICreateBlogReducerInitialState = {
@@ -99,6 +99,7 @@ export function createBlog(
     }
     case FETCH_BLOG_SUCCESS: {
       state.data = action.payload.res.content;
+      state.data.title = action.payload.res.title;
       return {
         ...state,
         asyncStatus: SUCCESS,

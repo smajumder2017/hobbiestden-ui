@@ -9,8 +9,7 @@ import { GetConnectDispatchPropsType } from "../../utils/actionCreators";
 import { RouteComponentProps } from "react-router-dom";
 import {
   List,
-  Space,
-  Avatar,
+  // Space,
   Row,
   Col,
   Button,
@@ -23,33 +22,37 @@ import {
   Card,
   Popconfirm,
   Tag,
+  Tooltip,
+  message,
 } from "antd";
 import {
-  StarOutlined,
-  LikeOutlined,
-  MessageOutlined,
   PlusOutlined,
   SnippetsOutlined,
   EditOutlined,
   DeleteOutlined,
+  SendOutlined,
+  ScissorOutlined,
+  UndoOutlined,
 } from "@ant-design/icons";
 import ImageUploader from "../../components/ImageUploader/ImageUploader";
 import ImageViewer from "../../components/ImageViewer";
 
 import "./BloggerContainer.css";
 
+const prettyDate = require("pretty-date");
+
 type TStateProps = ReturnType<typeof mapStateToProps>;
-type TBindActionCreators = typeof BloggerActions & typeof FileUploadActions;
-type TDispatchProps = GetConnectDispatchPropsType<TBindActionCreators>;
+type TBindActionCreator = typeof BloggerActions & typeof FileUploadActions;
+type TDispatchProps = GetConnectDispatchPropsType<TBindActionCreator>;
 
 type TAllProps = TStateProps & TDispatchProps & RouteComponentProps;
 
-const IconText = (args: any) => (
-  <Space>
-    {React.createElement(args.icon)}
-    {args.text}
-  </Space>
-);
+// const IconText = (args: any) => (
+//   <Space>
+//     {React.createElement(args.icon)}
+//     {args.text}
+//   </Space>
+// );
 
 const BloggerContainer: React.FC<TAllProps> = (props) => {
   const [loader, setLoader] = useState(false);
@@ -103,14 +106,21 @@ const BloggerContainer: React.FC<TAllProps> = (props) => {
   const handleCreateBlog = async () => {
     setLoader(true);
     try {
-      const {payload:{res:{blogId}}} = await props.createBlog(createBlogForm);
+      const content = props.createBlogData;
+      delete content?.tempCoverImage;
+      const payload = { ...createBlogForm, content };
+      const {
+        payload: {
+          res: { blogId },
+        },
+      } = await props.createBlog(payload);
       notification.open({
         placement: "bottomLeft",
         message: "Blog Created",
         description: "Start editing your blog...",
         type: "success",
       });
-      props.history.push(`/blogger/create/${blogId}`)
+      props.history.push(`/blogger/create/${blogId}`);
     } catch (error) {
       console.log(error);
     }
@@ -126,9 +136,20 @@ const BloggerContainer: React.FC<TAllProps> = (props) => {
     }
   };
 
+  const updateBlogStatus = async (
+    blogId: string,
+    status: "CREATED" | "SUBMITTED" | "APPROVED" | "PUBLISHED" | "NOT APPROVED"
+  ) => {
+    try {
+      await props.updateBlogStatus({ blogId, status });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const data = props.blogger.data
     ? props.blogger.data.map((blog) => ({
-        title: blog.content.title,
+        title: blog.title,
         subTitle: blog.content.subTitle,
         image:
           blog.thumbnailImage ||
@@ -136,16 +157,94 @@ const BloggerContainer: React.FC<TAllProps> = (props) => {
         status: blog.status,
         blogId: blog.blogId,
         category: blog.category,
-        avatarImage: blog.creator.image,
+        avatarImage: blog.user.image,
         userShortName:
-          blog.creator.firstName.charAt(0) +
-          " " +
-          blog.creator.lastName.charAt(0),
+          blog.user.firstName.charAt(0) + " " + blog.user.lastName.charAt(0),
+        createdAt: blog.createdAt,
+        updatedAt: blog.updatedAt,
+        publishDate: blog.publishDate,
       }))
     : [];
 
+  const renderBlogActions = (
+    blogId: string,
+    status: "CREATED" | "SUBMITTED" | "APPROVED" | "PUBLISHED" | "NOT APPROVED"
+  ) => {
+    switch (status) {
+      case "CREATED":
+        return (
+          <Tooltip title="Submit For Approval">
+            <SnippetsOutlined
+              key="setting"
+              onClick={() => updateBlogStatus(blogId, "SUBMITTED")}
+            />
+          </Tooltip>
+        );
+      case "SUBMITTED":
+        return (
+          <Tooltip title="Undo Submit">
+            <UndoOutlined
+              key="setting"
+              onClick={() => updateBlogStatus(blogId, "CREATED")}
+            />
+          </Tooltip>
+        );
+      case "APPROVED":
+        return (
+          <Tooltip title="Click to Publish">
+            <SendOutlined
+              onClick={() => updateBlogStatus(blogId, "PUBLISHED")}
+            />
+          </Tooltip>
+        );
+      case "PUBLISHED":
+        return (
+          <Tooltip title="Click to Unpublish">
+            <ScissorOutlined
+              onClick={() => updateBlogStatus(blogId, "SUBMITTED")}
+            />
+          </Tooltip>
+        );
+      default:
+        break;
+    }
+  };
+
+  const renderStatus = (
+    status: "CREATED" | "SUBMITTED" | "APPROVED" | "PUBLISHED" | "NOT APPROVED"
+  ) => {
+    switch (status) {
+      case "CREATED":
+        return <Tag color="green">{status}</Tag>;
+      case "SUBMITTED":
+        return <Tag color="processing">{status}</Tag>;
+      case "APPROVED":
+        return <Tag color="success">{status}</Tag>;
+      case "PUBLISHED":
+        return <Tag color="gold">{status}</Tag>;
+      case "NOT APPROVED":
+        return <Tag color="error">{status}</Tag>;
+      default:
+        break;
+    }
+  };
+
+  const handleEditClick = (
+    blogId: string,
+    status: "CREATED" | "SUBMITTED" | "APPROVED" | "PUBLISHED" | "NOT APPROVED"
+  ) => {
+    if (status === "PUBLISHED") {
+      message.error(
+        "Please unpublish the blog before editing. (Note: If you unpublish the blog it again needs to be reviewed, status will be changed to SUBMITTED)",
+        5
+      );
+      return;
+    }
+    props.history.push(`blogger/create/${blogId}`);
+  };
+
   return (
-    <div className="home-content">
+    <div className="blog-content">
       {props.blogger.data?.length === 0 ? (
         <Row>
           <Col span={18}>
@@ -173,116 +272,104 @@ const BloggerContainer: React.FC<TAllProps> = (props) => {
       ) : (
         <Row>
           <Col span={18}>
+            <div
+              style={{
+                display: "flex",
+                padding: "10px 20px",
+                justifyContent: "space-between",
+              }}
+            >
+              <h2>Your Blogs</h2>
+              <Button
+                type="primary"
+                size="large"
+                icon={<PlusOutlined />}
+                onClick={() => setCreateBlogModal(true)}
+              >
+                Create New Blog
+              </Button>
+            </div>
             <List
-              header={<h2>Your Blogs</h2>}
-              itemLayout="vertical"
               loading={props.blogger.asyncStatus === "LOADING"}
-              size="large"
+              grid={{
+                gutter: 16,
+                xs: 1,
+                sm: 2,
+                md: 3,
+                lg: 3,
+                xl: 3,
+                xxl: 4,
+              }}
               pagination={{
                 onChange: (page) => {
                   console.log(page);
                 },
-                pageSize: 6,
+                pageSize: 8,
               }}
-              footer={
-                <div style={{ display: "flex", padding: "0px 20px" }}>
-                  <Button
-                    type="primary"
-                    size="large"
-                    icon={<PlusOutlined />}
-                    onClick={() => setCreateBlogModal(true)}
-                  >
-                    Create New Blog
-                  </Button>
-                </div>
-              }
               dataSource={data}
               renderItem={(item) => (
                 <List.Item
-                  key={item.title}
-                  actions={
-                    !(item.status === "CREATED" || item.status === "APPROVED")
-                      ? [
-                          <IconText
-                            icon={StarOutlined}
-                            text="156"
-                            key="list-vertical-star-o"
-                          />,
-                          <IconText
-                            icon={LikeOutlined}
-                            text="156"
-                            key="list-vertical-like-o"
-                          />,
-                          <IconText
-                            icon={MessageOutlined}
-                            text="2"
-                            key="list-vertical-message"
-                          />,
-                        ]
-                      : []
-                  }
-                  extra={
-                    <ImageViewer
-                      src={item.image}
-                      style={{
-                        width: "272px",
-                        height: "170px",
-                        objectFit: "contain",
-                      }}
-                    />
-                  }
+                  key={item.blogId}
+                  style={{ display: "flex", justifyContent: "center" }}
                 >
-                  <List.Item.Meta
-                    avatar={
-                      item.avatarImage ? (
-                        <Avatar src={item.avatarImage} />
-                      ) : (
-                        <Avatar>{item.userShortName}</Avatar>
-                      )
-                      // <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
+                  <Card
+                    // style={{ width: 300 }}
+                    cover={
+                      <ImageViewer
+                        src={item.image}
+                        style={{
+                          width: "100%",
+                          height: "170px",
+                          objectFit: "cover",
+                        }}
+                      />
                     }
-                    title={item.title}
-                    description={item.subTitle}
-                  />
-                  {item.category && (
-                    <div>
-                      <Tag style={{ textTransform: "capitalize" }} color="blue">
-                        {item.category}
-                      </Tag>
-                    </div>
-                  )}
-                  <div style={{ display: "flex", flexDirection: "column" }}>
-                    <div
-                      style={{ display: "flex", justifyContent: "flex-end" }}
-                    >
-                      {item.status === "CREATED" && (
-                        <div style={{ marginRight: "5px" }}>
-                          <Button type="primary" icon={<SnippetsOutlined />}>
-                            Request Approval
-                          </Button>
-                        </div>
-                      )}
-                      <div style={{ marginRight: "5px" }}>
-                        <Button
-                          type="default"
-                          icon={<EditOutlined />}
+                    actions={[
+                      renderBlogActions(item.blogId, item.status),
+                      <Tooltip
+                        title={
+                          item.status === "PUBLISHED"
+                            ? "Unpublish To Edit"
+                            : "Click to Edit"
+                        }
+                      >
+                        <EditOutlined
+                          key="edit"
                           onClick={() =>
-                            props.history.push(`blogger/create/${item.blogId}`)
+                            handleEditClick(item.blogId, item.status)
                           }
-                        >
-                          Edit
-                        </Button>
-                      </div>
+                        />
+                      </Tooltip>,
                       <Popconfirm
                         placement="top"
                         title={"You want to delete this blog?"}
                         okText="Yes"
                         cancelText="No"
                       >
-                        <Button icon={<DeleteOutlined />}>Remove</Button>
-                      </Popconfirm>
+                        <DeleteOutlined key="delete" />
+                      </Popconfirm>,
+                    ]}
+                  >
+                    <div className="card-title">{item.title}</div>
+                    <div style={{ margin: "5px 5px 5px 0px" }}>
+                      {renderStatus(item.status)}
                     </div>
-                  </div>
+                    <div>
+                      {item.category && (
+                        <div
+                          style={{
+                            fontStyle: "italic",
+                            textTransform: "capitalize",
+                          }}
+                        >
+                          {`On `} {<b>{item.category}</b>}{" "}
+                          {`, Last Edited at ${prettyDate.format(
+                            new Date(item.updatedAt)
+                          )}`}
+                        </div>
+                      )}
+                    </div>
+                  </Card>
                 </List.Item>
               )}
             />
@@ -366,11 +453,12 @@ const BloggerContainer: React.FC<TAllProps> = (props) => {
 const mapStateToProps = (state: IHobbiestDenAppState) => {
   return {
     blogger: state.blogger,
+    createBlogData: state.createBlog.data,
   };
 };
 
 const mapDispatchToProps = (dispatch: Dispatch) =>
-  bindActionCreators<TBindActionCreators, TDispatchProps>(
+  bindActionCreators<TBindActionCreator, TDispatchProps>(
     { ...BloggerActions, ...FileUploadActions },
     dispatch
   );

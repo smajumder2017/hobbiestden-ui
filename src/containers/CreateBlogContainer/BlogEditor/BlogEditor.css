@@ -12,8 +12,7 @@
 
 .editor .container {
   flex:1;
-  
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .hidden {
@@ -40,4 +39,16 @@
 .textContent p{
   text-overflow: ellipsis;
     white-space: normal;
- }
+}
+
+/* .ant-anchor-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 64px);
+  max-height: calc(100vh - 64px);
+  background-color: none;
+} */
+
+.ant-anchor .ant-anchor-ink {
+  display: none;
+}

@@ -10,6 +10,7 @@ import {
   ICreateBlog,
   ICreateBlogRequest,
 } from "../models/CreateBlogModel";
+import {IComment, ICommentInput} from '../models/CommentsModel';
 import config from "../config";
 
 export const register = (apiArgs: ICreateUserRequest) => {
@@ -26,11 +27,16 @@ export const login = (apiArgs: IAuthRequest) => {
   );
 };
 
-export const facebookLogin = (apiArgs: {email: string; firstName: string; lastName: string; image: string}) => {
-  return http.post<{email: string; firstName: string; lastName: string; image: string}, IAuthResponse>(
-    `${config.backendServiceUrl}auth/facebooklogin`,
-    apiArgs
-  );
+export const facebookLogin = (apiArgs: {
+  email: string;
+  firstName: string;
+  lastName: string;
+  image: string;
+}) => {
+  return http.post<
+    { email: string; firstName: string; lastName: string; image: string },
+    IAuthResponse
+  >(`${config.backendServiceUrl}auth/facebooklogin`, apiArgs);
 };
 
 export const fetchSession = () => {
@@ -60,7 +66,11 @@ export const createBlog = (args: ICreateBlogRequest) => {
   );
 };
 
-export const saveBlog = (args: { blogId: string; content: ICreateBlog }) => {
+export const saveBlog = (args: {
+  blogId: string;
+  content: ICreateBlog;
+  title: string;
+}) => {
   return http.patch<{ blogId: string; content: ICreateBlog }, IBlogResponse>(
     `${config.backendServiceUrl}blog`,
     args
@@ -73,14 +83,57 @@ export const fetchAllBlogsByUser = () => {
   );
 };
 
-export const fetchBlogsByStatus = (args: {status: string}) => {
+export const fetchBlogsByStatus = (args: { status: string }) => {
   return http.get<{}, IBlogResponse[]>(
-    `${config.backendServiceUrl}blog/allBlogs`, {...args}
+    `${config.backendServiceUrl}blog/allBlogs`,
+    { ...args }
   );
 };
 
+export const updateBlogStatus = (args: {
+  blogId: string;
+  status: "CREATED" | "SUBMITTED" | "APPROVED" | "PUBLISHED" | "NOT APPROVED";
+}) => {
+  return http.put<
+    {
+      blogId: string;
+      status:
+        | "CREATED"
+        | "SUBMITTED"
+        | "APPROVED"
+        | "PUBLISHED"
+        | "NOT APPROVED";
+    },
+    IBlogResponse
+  >(`${config.backendServiceUrl}blog/status`, args);
+};
+
 export const fetchAllCategories = () => {
-  return http.get<{}, Array<{category: string; tags: string[]}>>(
-    `${config.backendServiceUrl}category`,
+  return http.get<{}, Array<{ category: string; tags: string[] }>>(
+    `${config.backendServiceUrl}category`
+  );
+};
+
+export const fetchComments = (args: {blogId: string}) => {
+  return http.get<{}, Array<IComment>>(
+    `${config.backendServiceUrl}comments/${args.blogId}`
+  );
+}
+
+export const createComment = (args: ICommentInput) => {
+  return http.post<ICommentInput, IComment>(
+    `${config.backendServiceUrl}comments/`, args
+  );
+}
+
+export const updateComment = (args: {commentId: string; body: string}) => {
+  return http.put<{commentId: string; body: string}, string>(
+    `${config.backendServiceUrl}comments/`, args
+  );
+}
+
+export const removeComment = (args: {commentId: string}) => {
+  return http.delete<{commentId: string}, string>(
+    `${config.backendServiceUrl}comments/`, args
   );
 }

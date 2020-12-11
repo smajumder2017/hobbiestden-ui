@@ -1,3 +1,3 @@
 export default {
-  backendServiceUrl: "http://192.168.0.102:5000/",
+  backendServiceUrl: "http://localhost:5000/",
 };

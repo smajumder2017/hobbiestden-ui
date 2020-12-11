@@ -1,6 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
-import { Button, Input, Divider, Collapse, Form, TreeSelect, Spin } from "antd";
+import {
+  Button,
+  Input,
+  Divider,
+  Collapse,
+  Form,
+  TreeSelect,
+  Anchor,
+} from "antd";
 import { PlusCircleOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import { IHobbiestDenAppState } from "../../../redux/reducers";
 import { Dispatch, bindActionCreators } from "redux";
@@ -34,6 +42,7 @@ const BlogEditor: React.FC<TAllProps> = (props) => {
   const [activeSection, setActiveSection] = useState<
     string | number | string[]
   >(["0"]);
+  // todo: change this save logic to onblur
   useEffect(() => {
     (async () => {
       if (props.createBlog.data) {
@@ -63,6 +72,7 @@ const BlogEditor: React.FC<TAllProps> = (props) => {
       props.saveBlog({
         blogId: props.blogId,
         content,
+        title: props.createBlog.data.title
       });
     }
   };
@@ -212,229 +222,243 @@ const BlogEditor: React.FC<TAllProps> = (props) => {
 
   return (
     <div className="editor">
-      <Divider orientation="left">
-        <h3>Blog Editor</h3>
-      </Divider>
-      <div className="container">
-        <Form style={{ paddingLeft: "10px", paddingRight: "10px" }}>
-          <FormItem>
-            <Input
-              addonBefore="Title"
-              placeholder="Enter Blog Title"
-              onChange={(e) => props.updateTitle(e.target.value)}
-              value={props.createBlog.data?.title}
-            />
-          </FormItem>
-          <FormItem>
-            <Input
-              placeholder="Enter Blog Subtitle"
-              addonBefore="Subtitle"
-              onChange={(e) => props.updateSubtitle(e.target.value)}
-              value={props.createBlog.data?.subTitle}
-            />
-          </FormItem>
-          <FormItem>
-            {props.createBlog.data?.coverImageUrl && (
-              <ImageViewer
-                src={props.createBlog.data.coverImageUrl}
-                handleRemoveImage={() => props.updateCoverImage("")}
-              />
-            )}
-            <FileUploader
-              value={props.createBlog.data?.tempCoverImage || ""}
-              onFileSelect={(file) => props.updateTempCoverImage(file)}
-              handleUpload={(file) => handleCoverImageUpload(file, true)}
-              crop={true}
-              handleCropSubmit={(file) => handleCoverImageUpload(file, false)}
-              buttonText="Upload Cover Image"
-              loader={loader}
-            />
-          </FormItem>
-          <FormItem>
-            <TreeSelect
-              showSearch
-              style={{ width: "100%" }}
-              value={tags}
-              dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
-              placeholder="Select Tags"
-              allowClear
-              multiple
-              onChange={(value) => setTags(value)}
-            >
-              <TreeSelect.TreeNode
-                value="python"
-                title="Python"
-              ></TreeSelect.TreeNode>
-              <TreeSelect.TreeNode
-                value="Javascript"
-                title="Javascript"
-              ></TreeSelect.TreeNode>
-              <TreeSelect.TreeNode
-                value="React"
-                title="React"
-              ></TreeSelect.TreeNode>
-              <TreeSelect.TreeNode
-                value="ReactJS"
-                title="ReactJS"
-              ></TreeSelect.TreeNode>
-              <TreeSelect.TreeNode
-                value="ReactNative"
-                title="ReactNative"
-              ></TreeSelect.TreeNode>
-            </TreeSelect>
-          </FormItem>
-        </Form>
         <Divider orientation="left">
-          <h4>Sections</h4>
+          <h3>Blog Editor</h3>
         </Divider>
-        <Collapse
-          activeKey={activeSection}
-          bordered={false}
-          onChange={(key) => setActiveSection(key)}
-        >
-          {props.createBlog.data?.sections.map((section, index) => (
-            <Panel
-              key={index}
-              header={section.header || `Section ${index + 1}`}
-            >
+        
+        <div className="container">
+        <Anchor affix={false} style={{margin: 0, padding: 0, maxHeight: 'none'}}>
+          <Form style={{ paddingLeft: "10px", paddingRight: "10px" }}>
+            <FormItem hasFeedback help={'Maximum 100 Characters'} style={{marginBottom: '5px'}}>
               <Input
-                placeholder="Enter Heading"
-                addonBefore="Heading"
-                value={section.header || ""}
-                onChange={(e) =>
-                  handleSectionHeadingChange(e.target.value, index)
-                }
-                onBlur={saveBlog}
+                addonBefore="Title"
+                addonAfter={props.createBlog.data?.title.length}
+                placeholder="Enter Blog Title"
+                onChange={(e) => props.updateTitle(e.target.value)}
+                value={props.createBlog.data?.title}
+                maxLength={100}
               />
-              <div>
-                <div style={{ marginTop: "10px" }}>
-                  <b>Left Content</b>
-                </div>
+            </FormItem>
+            <FormItem>
+              <Input
+                placeholder="Enter Blog Subtitle"
+                addonBefore="Subtitle"
+                onChange={(e) => props.updateSubtitle(e.target.value)}
+                value={props.createBlog.data?.subTitle}
+              />
+            </FormItem>
+            <FormItem>
+              {props.createBlog.data?.coverImageUrl && (
+                <ImageViewer
+                  src={props.createBlog.data.coverImageUrl}
+                  handleRemoveImage={() => props.updateCoverImage("")}
+                />
+              )}
+              <FileUploader
+                value={props.createBlog.data?.tempCoverImage || ""}
+                onFileSelect={(file) => props.updateTempCoverImage(file)}
+                handleUpload={(file) => handleCoverImageUpload(file, true)}
+                crop={true}
+                handleCropSubmit={(file) => handleCoverImageUpload(file, false)}
+                buttonText="Upload Cover Image"
+                loader={loader}
+              />
+            </FormItem>
+            {/* <FormItem>
+              <TreeSelect
+                showSearch
+                style={{ width: "100%" }}
+                value={tags}
+                dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
+                placeholder="Select Tags"
+                allowClear
+                multiple
+                onChange={(value) => setTags(value)}
+              >
+                <TreeSelect.TreeNode
+                  value="python"
+                  title="Python"
+                ></TreeSelect.TreeNode>
+                <TreeSelect.TreeNode
+                  value="Javascript"
+                  title="Javascript"
+                ></TreeSelect.TreeNode>
+                <TreeSelect.TreeNode
+                  value="React"
+                  title="React"
+                ></TreeSelect.TreeNode>
+                <TreeSelect.TreeNode
+                  value="ReactJS"
+                  title="ReactJS"
+                ></TreeSelect.TreeNode>
+                <TreeSelect.TreeNode
+                  value="ReactNative"
+                  title="ReactNative"
+                ></TreeSelect.TreeNode>
+              </TreeSelect>
+            </FormItem> */}
+          </Form>
+          <Divider orientation="left">
+            <h4>Sections</h4>
+          </Divider>
+          <Collapse
+            accordion
+            activeKey={activeSection}
+            bordered={false}
+            onChange={(key) => setActiveSection(key)}
+          >
+            {props.createBlog.data?.sections.map((section, index) => (
+              <Panel
+                key={index}
+                header={
+                  <div>
+                    <Anchor.Link
+                      href={`#${section.header || `Section ${index + 1}`}`}
+                      title={<div>{section.header || `Section ${index + 1}`}</div>}
+                    />
+                    </div>
+                }
+              >
+                <Input
+                  placeholder="Enter Heading"
+                  addonBefore="Heading"
+                  value={section.header || ""}
+                  onChange={(e) =>
+                    handleSectionHeadingChange(e.target.value, index)
+                  }
+                  onBlur={saveBlog}
+                />
+                <div>
+                  <div style={{ marginTop: "10px" }}>
+                    <b>Left Content</b>
+                  </div>
 
-                <SectionContent
-                  useSave={saveBlog}
-                  {...section.subSections.left}
-                  handleBackgroundColorChange={(value) =>
-                    handleBackgroundColorChange(value, index, "left")
-                  }
-                  handleBorderColorChange={(value) =>
-                    handleBorderColorChange(value, index, "left")
-                  }
-                  handleContentChange={(value) =>
-                    handleContentValueUpdate(value, index, "left")
-                  }
-                  handleContentTypeChange={(value) =>
-                    handleContentTypeUpdate(value, index, "left")
-                  }
-                  handleImageUpload={(file) =>
-                    hanldeContentImageUpload(file, index, "left")
-                  }
-                  handleCodeThemeChange={(value) =>
-                    handleCodeThemeChange(value, index, "left")
-                  }
-                  handleCodeLanguageChange={(value) =>
-                    handleCodeLanguageChange(value, index, "left")
-                  }
-                  handleAdjustImageSize={(value) =>
-                    handleAdjustImageChange(value, index, "left")
-                  }
-                />
-              </div>
-              <div>
-                <div style={{ marginTop: "10px" }}>
-                  <b>Center Content</b>
+                  <SectionContent
+                    useSave={saveBlog}
+                    {...section.subSections.left}
+                    handleBackgroundColorChange={(value) =>
+                      handleBackgroundColorChange(value, index, "left")
+                    }
+                    handleBorderColorChange={(value) =>
+                      handleBorderColorChange(value, index, "left")
+                    }
+                    handleContentChange={(value) =>
+                      handleContentValueUpdate(value, index, "left")
+                    }
+                    handleContentTypeChange={(value) =>
+                      handleContentTypeUpdate(value, index, "left")
+                    }
+                    handleImageUpload={(file) =>
+                      hanldeContentImageUpload(file, index, "left")
+                    }
+                    handleCodeThemeChange={(value) =>
+                      handleCodeThemeChange(value, index, "left")
+                    }
+                    handleCodeLanguageChange={(value) =>
+                      handleCodeLanguageChange(value, index, "left")
+                    }
+                    handleAdjustImageSize={(value) =>
+                      handleAdjustImageChange(value, index, "left")
+                    }
+                  />
                 </div>
-                <SectionContent
-                  useSave={saveBlog}
-                  {...section.subSections.center}
-                  handleBackgroundColorChange={(value) =>
-                    handleBackgroundColorChange(value, index, "center")
-                  }
-                  handleBorderColorChange={(value) =>
-                    handleBorderColorChange(value, index, "center")
-                  }
-                  handleContentChange={(value) =>
-                    handleContentValueUpdate(value, index, "center")
-                  }
-                  handleContentTypeChange={(value) =>
-                    handleContentTypeUpdate(value, index, "center")
-                  }
-                  handleImageUpload={(file) =>
-                    hanldeContentImageUpload(file, index, "center")
-                  }
-                  handleCodeThemeChange={(value) =>
-                    handleCodeThemeChange(value, index, "center")
-                  }
-                  handleCodeLanguageChange={(value) =>
-                    handleCodeLanguageChange(value, index, "center")
-                  }
-                  handleAdjustImageSize={(value) =>
-                    handleAdjustImageChange(value, index, "center")
-                  }
-                />
-              </div>
-              <div>
-                <div style={{ marginTop: "10px" }}>
-                  <b>Right Content</b>
+                <div>
+                  <div style={{ marginTop: "10px" }}>
+                    <b>Center Content</b>
+                  </div>
+                  <SectionContent
+                    useSave={saveBlog}
+                    {...section.subSections.center}
+                    handleBackgroundColorChange={(value) =>
+                      handleBackgroundColorChange(value, index, "center")
+                    }
+                    handleBorderColorChange={(value) =>
+                      handleBorderColorChange(value, index, "center")
+                    }
+                    handleContentChange={(value) =>
+                      handleContentValueUpdate(value, index, "center")
+                    }
+                    handleContentTypeChange={(value) =>
+                      handleContentTypeUpdate(value, index, "center")
+                    }
+                    handleImageUpload={(file) =>
+                      hanldeContentImageUpload(file, index, "center")
+                    }
+                    handleCodeThemeChange={(value) =>
+                      handleCodeThemeChange(value, index, "center")
+                    }
+                    handleCodeLanguageChange={(value) =>
+                      handleCodeLanguageChange(value, index, "center")
+                    }
+                    handleAdjustImageSize={(value) =>
+                      handleAdjustImageChange(value, index, "center")
+                    }
+                  />
                 </div>
-                <SectionContent
-                  useSave={saveBlog}
-                  {...section.subSections.right}
-                  handleBackgroundColorChange={(value) =>
-                    handleBackgroundColorChange(value, index, "right")
-                  }
-                  handleBorderColorChange={(value) =>
-                    handleBorderColorChange(value, index, "right")
-                  }
-                  handleContentChange={(value) =>
-                    handleContentValueUpdate(value, index, "right")
-                  }
-                  handleContentTypeChange={(value) =>
-                    handleContentTypeUpdate(value, index, "right")
-                  }
-                  handleImageUpload={(file) =>
-                    hanldeContentImageUpload(file, index, "right")
-                  }
-                  handleCodeThemeChange={(value) =>
-                    handleCodeThemeChange(value, index, "right")
-                  }
-                  handleCodeLanguageChange={(value) =>
-                    handleCodeLanguageChange(value, index, "right")
-                  }
-                  handleAdjustImageSize={(value) =>
-                    handleAdjustImageChange(value, index, "right")
-                  }
-                />
-              </div>
-              <div style={{ marginTop: "20px" }}>
-                <Button
-                  type="dashed"
-                  danger
-                  style={{ width: "100%" }}
-                  icon={<MinusCircleOutlined />}
-                  onClick={() => {
-                    props.removeSection(index);
-                    saveBlog();
-                  }}
-                >
-                  Remove
-                </Button>
-              </div>
-            </Panel>
-          ))}
-        </Collapse>
-      </div>
-      <Button
-        type="primary"
-        size="large"
-        icon={<PlusCircleOutlined />}
-        onClick={() => {
-          props.addSection();
-          saveBlog();
-        }}
-      >
-        Add Section
-      </Button>
+                <div>
+                  <div style={{ marginTop: "10px" }}>
+                    <b>Right Content</b>
+                  </div>
+                  <SectionContent
+                    useSave={saveBlog}
+                    {...section.subSections.right}
+                    handleBackgroundColorChange={(value) =>
+                      handleBackgroundColorChange(value, index, "right")
+                    }
+                    handleBorderColorChange={(value) =>
+                      handleBorderColorChange(value, index, "right")
+                    }
+                    handleContentChange={(value) =>
+                      handleContentValueUpdate(value, index, "right")
+                    }
+                    handleContentTypeChange={(value) =>
+                      handleContentTypeUpdate(value, index, "right")
+                    }
+                    handleImageUpload={(file) =>
+                      hanldeContentImageUpload(file, index, "right")
+                    }
+                    handleCodeThemeChange={(value) =>
+                      handleCodeThemeChange(value, index, "right")
+                    }
+                    handleCodeLanguageChange={(value) =>
+                      handleCodeLanguageChange(value, index, "right")
+                    }
+                    handleAdjustImageSize={(value) =>
+                      handleAdjustImageChange(value, index, "right")
+                    }
+                  />
+                </div>
+                <div style={{ marginTop: "20px" }}>
+                  <Button
+                    type="dashed"
+                    danger
+                    style={{ width: "100%" }}
+                    icon={<MinusCircleOutlined />}
+                    onClick={() => {
+                      props.removeSection(index);
+                      saveBlog();
+                    }}
+                  >
+                    Remove
+                  </Button>
+                </div>
+              </Panel>
+            ))}
+          </Collapse>
+          </Anchor>
+        </div>
+        
+        <Button
+          type="primary"
+          size="large"
+          icon={<PlusCircleOutlined />}
+          onClick={() => {
+            props.addSection();
+            saveBlog();
+          }}
+        >
+          Add Section
+        </Button>
     </div>
   );
 };

@@ -43,11 +43,11 @@ const CreateBlogCotainer: React.FC<TAllProps> = (props) => {
           <Button type="primary" onClick={()=>props.history.push('/blogger')}>Done Editing</Button>
           </div>
         </div>
-        { props.createBlog.data?.title ? <BlogPreviewer /> : <Spin />}
+        { props.createBlog.data ? <BlogPreviewer /> : <Spin />}
       </Col>
       <Col span={6}>
         {
-          props.createBlog.data?.title ? <BlogEditor blogId={blogid} /> : <Spin />
+          props.createBlog.data ? <BlogEditor blogId={blogid} /> : <Spin />
         }
       </Col>
     </Row>

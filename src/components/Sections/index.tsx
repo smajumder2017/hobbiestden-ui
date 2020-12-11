@@ -73,6 +73,7 @@ export const SectionContents: React.FC<IContentOwnProps> = (props) => {
 
 interface ISectionOwnProps {
   sections: IBlogSections[];
+  id?: string;
 }
 
 export const Sections: React.FC<ISectionOwnProps> = (props) => {
@@ -121,7 +122,7 @@ export const Sections: React.FC<ISectionOwnProps> = (props) => {
         };
 
         return (
-          <div className="section" key={index}>
+          <div className="section" key={index} id={section.header || `Section ${index + 1}`}>
             <div className="section-header">{section.header}</div>
             <div className="section-content">
               {Object.keys(section.subSections).map((seckey: string, index) => {

@@ -8,6 +8,7 @@ export interface IAuthResponse {
 }
 
 export interface IFetchSession {
+  userId: string;
   email: string;
   firstName: string;
   lastName: string;

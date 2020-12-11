@@ -13,3 +13,31 @@
 .home-content {
   padding: 10px 50px;
 }
+
+.card-title {
+  font-weight: bold;
+  font-size: 16px;
+  overflow: hidden;
+text-overflow: ellipsis;
+-webkit-line-clamp: 2;
+display: -webkit-box;
+-webkit-box-orient: vertical;
+margin-bottom: 5px;
+height: 50px;
+}
+
+.home-content .ant-list-grid .ant-col > .ant-list-item {
+  display: flex;
+  justify-content: center;
+}
+
+.home-content .flex-row {
+  display: flex;
+  align-items: center;
+}
+
+.flex-row .flex-cell {
+  margin-right: 5px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}

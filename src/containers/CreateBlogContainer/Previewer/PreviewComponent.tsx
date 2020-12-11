@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useRef, useEffect } from "react";
 import { IHobbiestDenAppState } from "../../../redux/reducers";
 import CreateBlogActions from "../../../redux/actions/createBlogActions";
@@ -18,9 +19,11 @@ type TAllProps = TStateProps & TDispatchProps;
 
 export const PreviewComponent: React.FC<TAllProps> = (props) => {
   const scrollEnd = useRef<HTMLDivElement>(null);
-  useEffect(()=>{
-    scrollEnd.current && scrollEnd.current.scrollIntoView({ behavior: "smooth" });
-  }, [props.createBlog.data?.sections.length])
+  useEffect(() => {
+    scrollEnd.current &&
+      scrollEnd.current.scrollIntoView({ behavior: "smooth" });
+  }, [props.createBlog.data?.sections.length]);
+
   const userName =
     props.auth.data?.firstName && props.auth.data?.lastName
       ? props.auth.data?.firstName + " " + props.auth.data?.lastName
@@ -28,37 +31,33 @@ export const PreviewComponent: React.FC<TAllProps> = (props) => {
   return (
     <div className="preview-container">
       <Row>
-      <Col span={2}>
-      </Col>
-      <Col span={20}>
-      {props.createBlog.data?.coverImageUrl && (
-        <>
-          <div>
-            <img
-              src={props.createBlog.data?.coverImageUrl}
-              alt=""
-              style={{ width: "100%", height: "auto" }}
-            />
-          </div>
-          <BloggerInfo userName={userName} blogDate="10th June, 2020" />
-        </>
-      )}
+        <Col span={2}></Col>
+        <Col span={20}>
+          {props.createBlog.data?.coverImageUrl && (
+            <>
+              <div>
+                <img
+                  src={props.createBlog.data?.coverImageUrl}
+                  alt=""
+                  style={{ width: "100%", height: "auto" }}
+                />
+              </div>
+              <BloggerInfo userName={userName} blogDate="10th June, 2020" />
+            </>
+          )}
 
-      <div className="title">{props.createBlog.data?.title}</div>
-      <div className="subtitle">{props.createBlog.data?.subTitle}</div>
-      {!props.createBlog.data?.coverImageUrl && (
-        <BloggerInfo userName={userName} blogDate="10th June, 2020" />
-      )}
-      {props.createBlog.data?.sections && (
-        <Sections sections={props.createBlog.data?.sections} />
-      )}
-      </Col>
-      <Col span={2}>
-      </Col>
+          <div className="title">{props.createBlog.data?.title}</div>
+          <div className="subtitle">{props.createBlog.data?.subTitle}</div>
+          {!props.createBlog.data?.coverImageUrl && (
+            <BloggerInfo userName={userName} blogDate="10th June, 2020" />
+          )}
+          {props.createBlog.data?.sections && (
+            <Sections sections={props.createBlog.data?.sections} />
+          )}
+        </Col>
+        <Col span={2}></Col>
       </Row>
-      <div style={{ float:"left", clear: "both" }}
-             ref={scrollEnd}>
-        </div>
+      <div style={{ float: "left", clear: "both" }} ref={scrollEnd}></div>
     </div>
   );
 };

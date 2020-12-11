@@ -34,15 +34,15 @@ interface IContentResponse extends ICreateBlog {
   tempCoverImage: never;
 }
 
-export interface ICreateBlogRequest {title: string, category?: string, thumbnailImage: string};
+export interface ICreateBlogRequest {title: string, category?: string, thumbnailImage: string, content: ICreateBlog | null};
 
 export interface IBlogResponse {
-  status: "CREATED" | "SUBMITTED" | "APPROVED" | "NOT APPROVED";
+  title: string;
+  status: "CREATED" | "SUBMITTED" | "APPROVED" | "NOT APPROVED" | "PUBLISHED";
   starts: number;
   likes: number;
   approver: string | null;
-  _id: string;
-  creator: {
+  user: {
     firstName: string;
     lastName: string;
     image?: string;
@@ -52,5 +52,6 @@ export interface IBlogResponse {
   thumbnailImage: string | null;
   createdAt: string;
   updatedAt: string;
+  publishDate: string | null;
   content: IContentResponse;
 }
